@@ -81,7 +81,7 @@ This is a document analysis tool for the gamified fitness coaching interface pro
 
 ## License
 
-See repository license file for details.
+No license file is currently included in this repository. Please contact the repository owner for licensing information.
 
 ## Contact
 

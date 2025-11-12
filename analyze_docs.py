@@ -35,11 +35,11 @@ class DocumentAnalyzer:
         for docx_file in docx_files:
             try:
                 doc = Document(docx_file)
+                paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
                 self.documents[docx_file.name] = {
                     'path': docx_file,
-                    'document': doc,
-                    'paragraphs': [p.text for p in doc.paragraphs if p.text.strip()],
-                    'num_paragraphs': len([p for p in doc.paragraphs if p.text.strip()])
+                    'paragraphs': paragraphs,
+                    'num_paragraphs': len(paragraphs)
                 }
                 ingested.append(docx_file.name)
                 print(f"✓ Ingested: {docx_file.name}")
@@ -52,7 +52,21 @@ class DocumentAnalyzer:
     def digest_docs(self) -> Dict[str, Any]:
         """
         Digest the ingested documents by analyzing their content.
-        Returns a summary of the analysis.
+        
+        Returns:
+            Dict[str, Any]: A summary of the analysis with the following structure:
+                {
+                    'total_documents': int,  # Total number of ingested documents
+                    'documents': {
+                        <doc_name>: {
+                            'num_paragraphs': int,      # Number of paragraphs in the document
+                            'word_count': int,          # Total word count in the document
+                            'key_topics': List[str],    # List of key topics extracted from the document
+                            'summary': str              # Brief summary from the first few paragraphs
+                        },
+                        ...
+                    }
+                }
         """
         print("\n" + "=" * 80)
         print("DIGESTING DOCUMENTS")
@@ -80,11 +94,35 @@ class DocumentAnalyzer:
             print(f"   Paragraphs: {doc_analysis['num_paragraphs']}")
             print(f"   Word Count: {doc_analysis['word_count']}")
             print(f"   Key Topics: {', '.join(doc_analysis['key_topics'][:5])}")
+            if doc_analysis['summary']:
+                print(f"   Summary: {doc_analysis['summary']}")
         
         return analysis
     
     def _extract_key_topics(self, paragraphs: List[str]) -> List[str]:
-        """Extract key topics from text using keyword frequency."""
+        """
+        Extract key topics from text using simple frequency analysis.
+
+        Algorithm:
+        - Converts text to lowercase and splits into words.
+        - Removes punctuation from each word.
+        - Applies basic stemming (removes -ing, -ed, -s suffixes).
+        - Filters out stop words and words with 3 or fewer characters.
+        - Counts the frequency of remaining words.
+        - Returns the top 10 most frequent words as key topics.
+
+        Limitations:
+        - Only considers word frequency; does not use semantic analysis.
+        - May miss multi-word topics or context-specific terms.
+        - Basic stemming may incorrectly modify some words.
+        - The stop word list is static and may not cover all common words.
+        
+        Args:
+            paragraphs (List[str]): List of paragraph texts to analyze.
+            
+        Returns:
+            List[str]: Top 10 most frequent words as key topics.
+        """
         # Expanded stop words list for better filtering
         stop_words = {
             'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
