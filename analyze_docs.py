@@ -26,7 +26,10 @@ class DocumentAnalyzer:
         print("INGESTING DOCUMENTS")
         print("=" * 80)
         
-        docx_files = list(self.base_dir.glob("**/*.docx"))
+        docx_files = [
+            f for f in self.base_dir.glob("**/*.docx")
+            if not any(part.startswith('.') or part.startswith('~$') for part in f.parts)
+        ]
         ingested = []
         
         for docx_file in docx_files:
