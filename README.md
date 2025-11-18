@@ -220,7 +220,12 @@ MIT License - See repository for details.
 
 ## Documentation
 
+### Core Philosophy
 - **`NORTH_STAR.md`** - 🌟 Core guiding principles and logical framework (START HERE)
+- **`LOGIC_ARCHITECTURE.md`** - 🏛️ Logical design patterns and decision-making framework
+- **`LOGIC_AUDIT.md`** - 🔍 Compliance audit against North Star principles
+
+### Technical Documentation
 - `/backend/README.md` - Complete backend API documentation
 - `FRONTEND_INTEGRATION.md` - Frontend integration guide with code examples
 - `OPTIMIZATIONS.md` - Performance optimization details
