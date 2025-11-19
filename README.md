@@ -1,22 +1,139 @@
-# Gamified Coach Interface - Document Analysis System
+# Gamified Coach Interface - Legion Command Center
 
-This repository contains a document analysis system that ingests, digests, and suggests development paths based on fitness coaching documentation.
+A comprehensive gamified fitness coaching platform featuring:
+- **V3 Holographic Interface**: Three.js-powered 3D command center with AI integration
+- **V2 Retro Interface**: Pixel RPG-style coaching dashboard
+- **Document Analysis System**: Python-based strategic document ingestion and analysis
 
-## Overview
+## 🚀 Quick Start - Legion Command Center V3
 
-The system analyzes Word documents (.docx) related to gamified fitness coaching and provides:
-- **Document Ingestion**: Reads and loads all Word documents in the repository
-- **Document Digestion**: Analyzes content, extracts key topics, and generates summaries
-- **Path Suggestion**: Recommends development paths and next steps based on document content
+### Requirements
 
-## Requirements
+- Node.js 18+ and npm
+- Modern web browser with WebGL support
+- (Optional) Gemini API key for AI-powered strategy generation
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/ivi374forivi/gamified-coach-interface.git
+cd gamified-coach-interface
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser to `http://localhost:3000/legion-v3.html`
+
+### Features
+
+**Legion Command Center V3** - Neo-brutalist holographic interface:
+- 🎮 **Interactive 3D Scene**: Strategy Core with orbital navigation nodes
+- 🤖 **AI Strategy Generation**: Gemini API integration for business analysis
+- 🎨 **Holographic Design**: Blade Runner 2049-inspired aesthetics
+- 📊 **Strategy Forge**: AI-powered target analysis and business planning
+- 🗺️ **Multi-Module System**: Intel visualization, field ops, training, archive
+
+## 🎯 Using Legion Command Center V3
+
+### First Time Setup
+
+1. **Boot Sequence**: On first load, you'll see the LEGION OS boot screen
+2. **3D Interface**: After boot, you'll see the Strategy Core (central holographic object) with 5 orbital nodes
+3. **Navigation**: Click on orbital nodes or use the bottom menu to access different modules
+
+### Modules Overview
+
+1. **TARGET ANALYSIS** (Cyan Node)
+   - Primary strategy forge for business planning
+   - AI-powered analysis of target avatars and transformation goals
+   - Requires Gemini API key for full functionality
+   - Fallback analysis available without API key
+
+2. **INTEL VISUALIZATION** (Orange Node)
+   - Market landscape and competitive analysis
+   - Visual data mapping (under development)
+
+3. **FIELD OPERATIONS** (Green Node)
+   - Operational dashboard
+   - Client and mission tracking (under development)
+
+4. **TRAINING PROTOCOLS** (Blue Node)
+   - Knowledge base and training modules
+   - Business strategy education (under development)
+
+5. **DATA ARCHIVE** (Grey Node)
+   - Access to analyzed strategic documents
+   - Reference materials and frameworks
+
+### API Configuration
+
+To enable AI-powered strategy generation:
+
+1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Click on **TARGET ANALYSIS** node
+3. Fill out the strategy parameters
+4. Click **INITIATE STRATEGIC ANALYSIS**
+5. When prompted, enter your API key (saved locally for future sessions)
+
+### Keyboard Shortcuts
+
+- `ESC` - Close active terminal/modal
+- Click anywhere on nodes or menu items to navigate
+
+## 🏗️ Project Structure
+
+```
+gamified-coach-interface/
+├── legion-v3.html          # V3 Main HTML (holographic interface)
+├── index.html              # V2 Command center (retro interface)
+├── client.html             # V2 Client-facing interface
+├── src/
+│   ├── main.js            # V3 Main application logic
+│   ├── SceneManager.js    # Three.js scene management
+│   ├── StrategyCore.js    # Central 3D holographic object
+│   └── OrbitalNodes.js    # Navigation node system
+├── analyze_docs.py         # Python document analyzer
+├── package.json           # Node.js dependencies
+├── vite.config.js         # Vite build configuration
+└── *.docx                 # Strategic documents
+
+```
+
+## 🛠️ Build for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+This will generate optimized files in the `dist/` directory.
+
+To preview the production build:
+
+```bash
+npm run preview
+```
+
+## 📖 Python Document Analysis
+
+### Requirements
 
 - Python 3.11+
 - python-docx library
 
-## Installation
+### Installation
 
-1. Clone the repository:
+1. Clone the repository (if not already done):
 ```bash
 git clone https://github.com/ivi374forivi/gamified-coach-interface.git
 cd gamified-coach-interface

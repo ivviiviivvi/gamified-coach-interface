@@ -1,0 +1,25 @@
+{
+  "name": "legion-command-center-v3",
+  "version": "3.0.0",
+  "description": "Gamified fitness coaching interface with holographic 3D experience",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "fitness",
+    "gamification",
+    "three.js",
+    "coaching"
+  ],
+  "author": "Legion Fitness",
+  "license": "MIT"
+}
