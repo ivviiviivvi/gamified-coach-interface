@@ -37,6 +37,7 @@ Commands:
   copy [--source S] [--target T]
                          Copy contents from S into T (creates T if missing). Non-destructive (S left intact).
   revert [--target T]   Remove symlink at T and restore any backed-up original T (if backup exists).
+    --max-backups N        Configure how many backups to keep (env MAX_BACKUPS also supported). Default: 5
   help                  Show this help
 
 Defaults:
@@ -95,6 +96,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --source) SOURCE=$(resolve_path "$2"); shift 2;;
     --target) TARGET=$(resolve_path "$2"); shift 2;;
+    --max-backups)
+      MAX_BACKUPS=$(printf "%s" "$2")
+      shift 2;;
     --wait) WAIT_SECONDS=$(printf "%s" "$2"); shift 2;;
     --wait-interval) WAIT_INTERVAL=$(printf "%s" "$2"); shift 2;;
     --dry-run) DRY_RUN=true; shift 1;;
@@ -104,28 +108,46 @@ while [[ $# -gt 0 ]]; do
 done
 
 timestamp() { date +%Y%m%d_%H%M%S; }
-
-MAX_BACKUPS=5
+MAX_BACKUPS="${MAX_BACKUPS:-5}"
 
 rotate_backups() {
-  local pattern="$HOME/.vscode_extensions_backup_*"
-  local -a items=( $pattern )
-  # items may expand to pattern if no matches
-  if [[ ${#items[@]} -le 1 && ! -e "${items[0]}" ]]; then
+  # Remove oldest backups beyond MAX_BACKUPS. Be defensive: only remove
+  # entries that match the expected backup name prefix inside HOME.
+  local backup_prefix="${HOME}/.vscode_extensions_backup_"
+  # enable nullglob when supported so non-matching globs expand to empty
+  shopt -s nullglob 2>/dev/null || true
+  local -a items=( ${backup_prefix}* )
+  local -a backups=()
+  for p in "${items[@]}"; do
+    [[ -e "$p" ]] || continue
+    backups+=("$p")
+  done
+  local total=${#backups[@]}
+  if [[ $total -le $MAX_BACKUPS ]]; then
     return 0
   fi
-  # sort by name (timestamped suffix ensures lexical order)
-  IFS=$'\n' sorted=( $(printf "%s\n" "${items[@]}" | sort) )
-  local keep=${MAX_BACKUPS}
-  local remove_count=$((${#sorted[@]} - keep))
-  if [[ $remove_count -le 0 ]]; then
-    return 0
-  fi
+  # sort lexical (timestamp suffix ensures chronological order)
+  IFS=$'\n' sorted=( $(printf "%s\n" "${backups[@]}" | sort) )
+  local remove_count=$(( total - MAX_BACKUPS ))
   for ((i=0;i<remove_count;i++)); do
-    # avoid using GNU-only `--` option for BSD rm on macOS
-    rm -rf "${sorted[i]}"
-    echo "Removed old backup: ${sorted[i]}"
-    log "Removed old backup: ${sorted[i]}"
+    local p="${sorted[i]}"
+    # safety: only operate on paths that start with backup_prefix
+    case "$p" in
+      "${HOME}"/.vscode_extensions_backup_*)
+        if [[ "$DRY_RUN" == "true" ]]; then
+          echo "[dry-run] rm -rf $p"
+          log "[dry-run] Would remove old backup: $p"
+        else
+          rm -rf "$p"
+          echo "Removed old backup: $p"
+          log "Removed old backup: $p"
+        fi
+        ;;
+      *)
+        echo "Skipping unsafe path during rotate: $p" >&2
+        log "Skipping unsafe path during rotate: $p"
+        ;;
+    esac
   done
 }
 
