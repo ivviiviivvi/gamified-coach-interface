@@ -1,236 +1,223 @@
-# Legion Command Center - Gamified Fitness Coaching Platform
+# Gamified Coach Interface - Legion Command Center
 
-A comprehensive gamified fitness coaching platform combining document analysis, backend API, and interactive web applications.
+A comprehensive gamified fitness coaching platform featuring:
+- **V3 Holographic Interface**: Three.js-powered 3D command center with AI integration
+- **V2 Retro Interface**: Pixel RPG-style coaching dashboard
+- **Document Analysis System**: Python-based strategic document ingestion and analysis
 
-## Overview
+## 🚀 Quick Start - Legion Command Center V3
 
-This repository contains a full-stack fitness coaching platform with:
+### Requirements
 
-### Backend API
-- **50+ REST API endpoints** for authentication, gamification, community, and more
-- **PostgreSQL database** with 30+ tables and comprehensive schema
-- **Real-time features** with Socket.IO (chat, notifications)
-- **AI strategy tools** powered by Gemini API
-- **Payment integration** with Stripe
-- **Analytics & tracking** for user behavior and platform metrics
+- Node.js 18+ and npm
+- Modern web browser with WebGL support
+- (Optional) Gemini API key for AI-powered strategy generation
 
-### Frontend Applications
-- **Legion Command Center**: Gamified coaching dashboard with 7 strategy terminals
-- **Client Portal**: User-facing gamified fitness application
-- **Index Page**: Project overview and navigation
+### Installation
 
-### Document Analysis System
-- **Document Ingestion**: Reads and analyzes Word documents (.docx)
-- **Content Extraction**: Extracts key topics and generates summaries
-- **Path Suggestion**: Recommends development paths based on content analysis
-- **Caching**: File hash-based caching for performance optimization
-
-## Requirements
-
-### Backend
-- Node.js >= 18.0.0
-- PostgreSQL >= 14
-- Redis (optional, for caching)
-
-### Document Analysis
-- Python 3.11+
-- python-docx library
-
-## Installation
-
-### 1. Clone the Repository
+1. Clone the repository:
 ```bash
 git clone https://github.com/ivi374forivi/gamified-coach-interface.git
 cd gamified-coach-interface
 ```
 
-### 2. Backend Setup
+2. Install dependencies:
 ```bash
-cd backend
-
-# Install dependencies
 npm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration (database, API keys, etc.)
-
-# Set up PostgreSQL database
-psql -U postgres -c "CREATE DATABASE legion_command_center;"
-psql -U postgres -d legion_command_center -f database/schema.sql
-psql -U postgres -d legion_command_center -f database/seed.sql
-
-# Start development server
-npm run dev
-
-# Or start production server
-npm start
 ```
 
-### 3. Document Analysis Setup
+3. Start the development server:
 ```bash
-# From project root
-pip install -r requirements.txt
+npm run dev
+```
 
-# Run the document analyzer
-python3 analyze_docs.py
+4. Open your browser to `http://localhost:3000/legion-v3.html`
+
+### Features
+
+**Legion Command Center V3** - Neo-brutalist holographic interface:
+- 🎮 **Interactive 3D Scene**: Strategy Core with orbital navigation nodes
+- 🤖 **AI Strategy Generation**: Gemini API integration for business analysis
+- 🎨 **Holographic Design**: Blade Runner 2049-inspired aesthetics
+- 📊 **Strategy Forge**: AI-powered target analysis and business planning
+- 🗺️ **Multi-Module System**: Intel visualization, field ops, training, archive
+
+## 🎯 Using Legion Command Center V3
+
+### First Time Setup
+
+1. **Boot Sequence**: On first load, you'll see the LEGION OS boot screen
+2. **3D Interface**: After boot, you'll see the Strategy Core (central holographic object) with 5 orbital nodes
+3. **Navigation**: Click on orbital nodes or use the bottom menu to access different modules
+
+### Modules Overview
+
+1. **TARGET ANALYSIS** (Cyan Node)
+   - Primary strategy forge for business planning
+   - AI-powered analysis of target avatars and transformation goals
+   - Requires Gemini API key for full functionality
+   - Fallback analysis available without API key
+
+2. **INTEL VISUALIZATION** (Orange Node)
+   - Market landscape and competitive analysis
+   - Visual data mapping (under development)
+
+3. **FIELD OPERATIONS** (Green Node)
+   - Operational dashboard
+   - Client and mission tracking (under development)
+
+4. **TRAINING PROTOCOLS** (Blue Node)
+   - Knowledge base and training modules
+   - Business strategy education (under development)
+
+5. **DATA ARCHIVE** (Grey Node)
+   - Access to analyzed strategic documents
+   - Reference materials and frameworks
+
+### API Configuration
+
+To enable AI-powered strategy generation:
+
+1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Click on **TARGET ANALYSIS** node
+3. Fill out the strategy parameters
+4. Click **INITIATE STRATEGIC ANALYSIS**
+5. When prompted, enter your API key (saved locally for future sessions)
+
+### Keyboard Shortcuts
+
+- `ESC` - Close active terminal/modal
+- Click anywhere on nodes or menu items to navigate
+
+## 🏗️ Project Structure
+
+```
+gamified-coach-interface/
+├── legion-v3.html          # V3 Main HTML (holographic interface)
+├── index.html              # V2 Command center (retro interface)
+├── client.html             # V2 Client-facing interface
+├── src/
+│   ├── main.js            # V3 Main application logic
+│   ├── SceneManager.js    # Three.js scene management
+│   ├── StrategyCore.js    # Central 3D holographic object
+│   └── OrbitalNodes.js    # Navigation node system
+├── analyze_docs.py         # Python document analyzer
+├── package.json           # Node.js dependencies
+├── vite.config.js         # Vite build configuration
+└── *.docx                 # Strategic documents
+
+```
+
+## 🛠️ Build for Production
+
+To create a production build:
+
+```bash
+npm run build
+```
+
+This will generate optimized files in the `dist/` directory.
+
+To preview the production build:
+
+```bash
+npm run preview
+```
+
+## 📖 Python Document Analysis
+
+### Requirements
+
+- Python 3.11+
+- python-docx library
+
+### Installation
+
+1. Clone the repository (if not already done):
+```bash
+git clone https://github.com/ivi374forivi/gamified-coach-interface.git
+cd gamified-coach-interface
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
 ```
 
 ## Usage
 
-### Backend API
-The backend server runs on `http://localhost:3000` (configurable via PORT env variable).
-
-API endpoints include:
-- `/api/v1/auth/*` - Authentication (register, login, refresh)
-- `/api/v1/users/*` - User management and XP
-- `/api/v1/achievements/*` - Achievement tracking
-- `/api/v1/quests/*` - Quest management
-- `/api/v1/skills/*` - Skill tree progression
-- `/api/v1/community/*` - Guilds, posts, comments
-- `/api/v1/strategy/*` - AI strategy generation
-- `/api/v1/fitness/*` - Workout and nutrition tracking
-- `/api/v1/payments/*` - Subscription management
-- `/api/v1/analytics/*` - Platform analytics
-
-See `/backend/README.md` and `FRONTEND_INTEGRATION.md` for complete API documentation.
-
-### Frontend Applications
-Open the HTML files directly in a web browser:
-- `legion-command-center-evolved.html` - Coach dashboard
-- `client.html` - Client portal
-- `index.html` - Project overview
-
-### Document Analysis
-The analyzer scans for `.docx` files and:
-1. Ingests and parses each document
-2. Extracts key topics and statistics
-3. Categorizes content (fitness, business, gamification)
-4. Suggests development paths based on analysis
-
-## Features
-
-### Gamification System
-- **XP & Leveling**: Dynamic XP system with exponential level progression
-- **Achievements**: 15+ unlockable achievements with progress tracking
-- **Skill Trees**: 6 RPG-style skill trees (Strength, Endurance, Nutrition, Mindset, Charisma, Wisdom)
-- **Quests**: Main quests, side quests, daily/weekly challenges, boss battles
-- **Habits**: Habit tracking with streak management and rewards
-
-### Community Features
-- **Guilds**: Create and join communities with member management
-- **Forum**: Posts, comments, likes with nested replies
-- **Real-time Chat**: Socket.IO integration for DMs and guild chat
-- **Leaderboards**: XP, level, streak, and activity-based rankings
-
-### AI Strategy Tools (Gemini Integration)
-- **7 Strategy Terminals**:
-  1. Hero Class - Customer avatar definition
-  2. Loot Table - Monetization/value ladder
-  3. Propaganda - Brand narrative
-  4. Threat Analysis - Competitor research
-  5. Mission Logs - Weekly planning
-  6. Guild Charter - Community design
-  7. Scriptorium - Content generation
-- **Context-Aware AI**: Multi-turn conversations with session history
-- **Workspace Management**: Save and organize strategy sessions
-
-### Business Features
-- **Stripe Integration**: Subscription and payment management
-- **Multi-tier Access**: Free, Potion, Core Quest, Raid, Mastermind tiers
-- **Analytics Dashboard**: User behavior and business metrics
-- **Email Automation**: Transactional and drip campaigns
-
-### Code Quality & Optimization
-- **Linting**: ESLint, Prettier, Pylint configurations
-- **Performance**: Memory leak fixes, event delegation, caching
-- **Repository Hygiene**: Optimized .gitignore, removed large binaries
-
-See `OPTIMIZATIONS.md` for detailed performance improvements and `backend/README.md` for complete backend documentation.
-
-## Project Structure
-
-```
-gamified-coach-interface/
-├── backend/                           # Node.js backend API
-│   ├── config/                       # Database configuration
-│   ├── controllers/                  # Business logic
-│   ├── database/                     # SQL schema and seed data
-│   ├── middleware/                   # Auth, error handling
-│   ├── models/                       # Data models
-│   ├── routes/                       # API routes (12 route files)
-│   ├── services/                     # Business services
-│   ├── utils/                        # Logger, helpers
-│   ├── server.js                     # Express app entry point
-│   ├── package.json                  # Dependencies
-│   └── README.md                     # Backend documentation
-├── .editorconfig                     # Editor configuration
-├── .eslintrc.json                    # ESLint rules
-├── .prettierrc                       # Code formatting
-├── .pylintrc                         # Python linting
-├── .gitignore                        # Git ignore rules
-├── analyze_docs.py                   # Document analysis tool
-├── client.html                       # Client portal
-├── index.html                        # Project overview
-├── legion-command-center-evolved.html # Coach dashboard
-├── requirements.txt                  # Python dependencies
-├── FRONTEND_INTEGRATION.md           # Frontend integration guide
-├── OPTIMIZATIONS.md                  # Performance optimizations
-└── README.md                         # This file
-```
-
-## Development
-
-### Code Quality
-The project includes linting and formatting tools:
+Run the document analyzer:
 
 ```bash
-# Python linting
-pylint analyze_docs.py
-
-# JavaScript linting (in backend/)
-npm run lint
-
-# Code formatting
-npx prettier --write "**/*.{js,json,md}"
+python3 analyze_docs.py
 ```
 
-### Testing
-```bash
-# Backend tests
-cd backend
-npm test
-```
+The script will:
+1. Scan the repository for `.docx` files
+2. Ingest and parse each document
+3. Analyze the content to extract key topics and statistics
+4. Provide a suggested development path based on the analysis
+
+## Output
+
+The analyzer provides:
+- List of ingested documents
+- Document statistics (paragraph count, word count)
+- Key topics extracted from each document
+- Categorization of documents (fitness, business, gamification themes)
+- Recommended development path with actionable steps
+- Suggested next steps for implementation
+
+## Documents in Repository
+
+The repository contains several key documents:
+- **Blueprint for a Niche Fitness Coaching Enterprise**: Deep dive into the Gamified Life Model
+- **Gym Chimera**: Specific fitness coaching concepts
+- **The Gamified Life**: Formal and casual perspective on gamification
+- **The Legion of Fitness**: Battle plan and interrogation strategies
+
+## Development Path
+
+## Development Path
+
+The recommended development phases are generated dynamically based on the content and themes found in the analyzed documents. The system identifies relevant topics and suggests actionable phases accordingly.
+
+For example:
+- If a document focuses only on fitness, the suggested phases may include:
+  1. **Foundation**: Core data models and user profiles
+  2. **Interface**: User dashboard and tracking tools
+  3. **Coaching Features**: Personalized recommendations and goal tracking
+- If business or gamification topics are present, additional phases such as **Gamification** and **Business Integration** may be included.
+
+Possible phases include:
+- **Foundation**: Core data models and user profiles
+- **Interface**: User dashboard and tracking tools
+- **Coaching Features**: Personalized recommendations and goal tracking
+- **Gamification**: Achievement systems and challenges
+- **Business Integration**: Payments, communication, and analytics
+Based on the document analysis, the recommended development phases are:
+
+1. **Foundation**: Core data models and user profiles
+2. **Interface**: User dashboard and tracking tools
+3. **Coaching Features**: Personalized recommendations and goal tracking
+4. **Gamification**: Achievement systems and challenges
+5. **Business Integration**: Payments, communication, and analytics
 
 ## Contributing
 
-Contributions are welcome! To contribute:
+This is a document analysis tool for the gamified fitness coaching interface project. To contribute:
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+1. Ensure Python 3.11+ is installed
+2. Install dependencies: `pip install -r requirements.txt`
 3. Make your changes
-4. Run linting and tests
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+4. Test the analysis script: `python3 analyze_docs.py`
+5. Submit a pull request
 
 ## License
 
-MIT License - See repository for details.
-
-## Documentation
-
-### Core Philosophy
-- **`NORTH_STAR.md`** - 🌟 Core guiding principles and logical framework (START HERE)
-- **`LOGIC_ARCHITECTURE.md`** - 🏛️ Logical design patterns and decision-making framework
-- **`LOGIC_AUDIT.md`** - 🔍 Compliance audit against North Star principles
-
-### Technical Documentation
-- `/backend/README.md` - Complete backend API documentation
-- `FRONTEND_INTEGRATION.md` - Frontend integration guide with code examples
-- `OPTIMIZATIONS.md` - Performance optimization details
-- `legion-cc-v3-design-spec.md` - Design specifications
+See repository license file for details.
+No license file is currently included in this repository. Please contact the repository owner for licensing information.
 
 ## Contact
 
-For questions or suggestions, please open an issue in the repository.
+For questions or suggestions about the document analysis system, please open an issue in the repository.
