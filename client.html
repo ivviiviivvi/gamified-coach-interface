@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gamified Life - Your Fitness Journey</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --theme-red: #C70039;
+            --theme-black: #000000;
+            --theme-white: #FFFFFF;
+            --theme-gray: #888888;
+            --theme-green: #00FF00;
+            --theme-blue: #0080FF;
+            --theme-gold: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--theme-black);
+            color: var(--theme-white);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        header {
+            border: 4px solid var(--theme-red);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, rgba(199, 0, 57, 0.2), rgba(0, 0, 0, 0.9));
+            box-shadow: 0 0 20px rgba(199, 0, 57, 0.5);
+        }
+
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--theme-red);
+            font-size: clamp(1rem, 4vw, 2.5rem);
+            margin: 0 0 1rem 0;
+            text-shadow: 2px 2px 0 var(--theme-black), 4px 4px 10px rgba(199, 0, 57, 0.8);
+        }
+
+        h2 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--theme-red);
+            font-size: clamp(0.8rem, 3vw, 1.5rem);
+            margin: 0 0 1rem 0;
+            text-shadow: 2px 2px 0 var(--theme-black);
+        }
+
+        h3 {
+            font-family: 'VT323', monospace;
+            color: var(--theme-white);
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-btn {
+            background-color: var(--theme-black);
+            color: var(--theme-white);
+            border: 2px solid var(--theme-gray);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--theme-red);
+            border-color: var(--theme-white);
+            color: var(--theme-white);
+            box-shadow: 0 0 10px rgba(199, 0, 57, 0.8);
+        }
+
+        .nav-btn.active {
+            background-color: var(--theme-red);
+            border-color: var(--theme-white);
+            color: var(--theme-white);
+        }
+
+        .stat-bar {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--theme-red);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            color: var(--theme-white);
+        }
+
+        .stat-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: var(--theme-gold);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: var(--theme-black);
+            border: 2px solid var(--theme-white);
+            position: relative;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--theme-red), var(--theme-gold));
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            color: var(--theme-white);
+            text-shadow: 1px 1px 2px var(--theme-black);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background-color: rgba(0, 0, 0, 0.8);
+            border: 3px solid var(--theme-gray);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--theme-red);
+            box-shadow: 0 0 20px rgba(199, 0, 57, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .quest-card {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--theme-blue);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .quest-card.completed {
+            border-color: var(--theme-green);
+            opacity: 0.6;
+        }
+
+        .quest-card:hover:not(.completed) {
+            border-color: var(--theme-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .quest-title {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: var(--theme-white);
+        }
+
+        .quest-reward {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: var(--theme-gold);
+        }
+
+        .quest-desc {
+            color: var(--theme-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .quest-difficulty {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            border: 1px solid;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-easy { color: var(--theme-green); border-color: var(--theme-green); }
+        .difficulty-medium { color: var(--theme-gold); border-color: var(--theme-gold); }
+        .difficulty-hard { color: var(--theme-red); border-color: var(--theme-red); }
+
+        .skill-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .skill-tier {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .skill-node {
+            width: 150px;
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--theme-gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .skill-node.unlocked {
+            border-color: var(--theme-green);
+            background-color: rgba(0, 255, 0, 0.1);
+        }
+
+        .skill-node.available {
+            border-color: var(--theme-gold);
+        }
+
+        .skill-node:hover.available {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            transform: scale(1.05);
+        }
+
+        .skill-name {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-desc {
+            font-size: 0.7rem;
+            color: var(--theme-gray);
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .achievement {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--theme-gray);
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .achievement.unlocked {
+            border-color: var(--theme-gold);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-desc {
+            font-size: 0.8rem;
+            color: var(--theme-gray);
+        }
+
+        .btn {
+            background-color: var(--theme-red);
+            color: var(--theme-white);
+            border: 2px solid var(--theme-white);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--theme-white);
+            color: var(--theme-red);
+            box-shadow: 0 0 20px rgba(199, 0, 57, 0.8);
+        }
+
+        .btn-secondary {
+            background-color: var(--theme-black);
+            border-color: var(--theme-gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--theme-gray);
+            color: var(--theme-white);
+        }
+
+        .character-sheet {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--theme-red);
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--theme-white);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--theme-black);
+            border: 2px solid var(--theme-gray);
+            color: var(--theme-white);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--theme-red);
+            box-shadow: 0 0 10px rgba(199, 0, 57, 0.5);
+        }
+
+        .leaderboard {
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--theme-gold);
+            padding: 1.5rem;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--theme-gray);
+        }
+
+        .leaderboard-entry:hover {
+            background-color: rgba(199, 0, 57, 0.2);
+        }
+
+        .leaderboard-rank {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--theme-gold);
+            min-width: 60px;
+        }
+
+        .leaderboard-name {
+            flex: 1;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+        }
+
+        .leaderboard-score {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            color: var(--theme-red);
+        }
+
+        @media (max-width: 640px) {
+            body { font-size: 14px; }
+            h1 { font-size: 1.2rem; }
+            h2 { font-size: 0.9rem; }
+            .nav-btn { font-size: 1rem; padding: 0.4rem 0.8rem; }
+            .skill-node { width: 120px; height: 120px; }
+            .btn { font-size: 0.7rem; padding: 0.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <div class="container">
+        <header>
+            <h1>⚔️ THE GAMIFIED LIFE ⚔️</h1>
+            <div class="stat-bar">
+                <div class="stat-row">
+                    <span class="stat-label">WARRIOR:</span>
+                    <span class="stat-value" id="player-name">HERO</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">LEVEL:</span>
+                    <span class="stat-value" id="player-level">1</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="xp-bar" style="width: 35%"></div>
+                    <div class="progress-text"><span id="xp-current">350</span> / <span id="xp-needed">1000</span> XP</div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-btn active" data-target="dashboard">DASHBOARD</button>
+            <button class="nav-btn" data-target="quests">QUEST BOARD</button>
+            <button class="nav-btn" data-target="skills">SKILL TREE</button>
+            <button class="nav-btn" data-target="achievements">ACHIEVEMENTS</button>
+            <button class="nav-btn" data-target="profile">PROFILE</button>
+            <button class="nav-btn" data-target="leaderboard">LEADERBOARD</button>
+        </nav>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard" class="content-section active">
+            <h2>📊 COMMAND CENTER</h2>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>💪 STRENGTH</h3>
+                    <div class="stat-value" style="font-size: 2rem; margin: 1rem 0;">18</div>
+                    <div class="progress-bar" style="height: 20px;">
+                        <div class="progress-fill" style="width: 72%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🏃 ENDURANCE</h3>
+                    <div class="stat-value" style="font-size: 2rem; margin: 1rem 0;">15</div>
+                    <div class="progress-bar" style="height: 20px;">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🧠 DISCIPLINE</h3>
+                    <div class="stat-value" style="font-size: 2rem; margin: 1rem 0;">12</div>
+                    <div class="progress-bar" style="height: 20px;">
+                        <div class="progress-fill" style="width: 48%"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚡ AGILITY</h3>
+                    <div class="stat-value" style="font-size: 2rem; margin: 1rem 0;">14</div>
+                    <div class="progress-bar" style="height: 20px;">
+                        <div class="progress-fill" style="width: 56%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📅 TODAY'S MISSION</h3>
+                <p style="color: var(--theme-gray); margin: 1rem 0;">Complete your daily workout to earn bonus XP and maintain your streak!</p>
+                <div style="margin: 1rem 0;">
+                    <div class="stat-row">
+                        <span>CURRENT STREAK:</span>
+                        <span class="stat-value">7 DAYS 🔥</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>BEST STREAK:</span>
+                        <span class="stat-value">14 DAYS</span>
+                    </div>
+                </div>
+                <button class="btn">START WORKOUT</button>
+            </div>
+        </section>
+
+        <!-- QUEST BOARD SECTION -->
+        <section id="quests" class="content-section">
+            <h2>📜 ACTIVE QUESTS</h2>
+
+            <div class="quest-card">
+                <div class="quest-header">
+                    <span class="quest-title">⚔️ WARRIOR'S PATH: STRENGTH TRAINING</span>
+                    <span class="quest-reward">+150 XP</span>
+                </div>
+                <p class="quest-desc">Complete 3 sets of compound lifts: Squats, Deadlifts, and Bench Press</p>
+                <span class="quest-difficulty difficulty-medium">DIFFICULTY: MEDIUM</span>
+                <div style="margin-top: 1rem;">
+                    <button class="btn">ACCEPT QUEST</button>
+                </div>
+            </div>
+
+            <div class="quest-card">
+                <div class="quest-header">
+                    <span class="quest-title">🏃 ENDURANCE TRIAL: CARDIO CHALLENGE</span>
+                    <span class="quest-reward">+100 XP</span>
+                </div>
+                <p class="quest-desc">Run 5km or complete 30 minutes of cardio at moderate intensity</p>
+                <span class="quest-difficulty difficulty-easy">DIFFICULTY: EASY</span>
+                <div style="margin-top: 1rem;">
+                    <button class="btn">ACCEPT QUEST</button>
+                </div>
+            </div>
+
+            <div class="quest-card completed">
+                <div class="quest-header">
+                    <span class="quest-title">✅ MORNING RITUAL: MOBILITY WORK</span>
+                    <span class="quest-reward">+50 XP</span>
+                </div>
+                <p class="quest-desc">Complete 15 minutes of stretching and mobility exercises</p>
+                <span class="quest-difficulty difficulty-easy">DIFFICULTY: EASY</span>
+                <div style="margin-top: 1rem; color: var(--theme-green);">
+                    ✓ COMPLETED
+                </div>
+            </div>
+
+            <div class="quest-card">
+                <div class="quest-header">
+                    <span class="quest-title">🔥 BOSS BATTLE: PERSONAL RECORD</span>
+                    <span class="quest-reward">+300 XP</span>
+                </div>
+                <p class="quest-desc">Set a new personal record in any major lift</p>
+                <span class="quest-difficulty difficulty-hard">DIFFICULTY: HARD</span>
+                <div style="margin-top: 1rem;">
+                    <button class="btn">ACCEPT QUEST</button>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 2rem;">🎯 WEEKLY CHALLENGES</h2>
+
+            <div class="quest-card">
+                <div class="quest-header">
+                    <span class="quest-title">📆 CONSISTENCY KING</span>
+                    <span class="quest-reward">+500 XP</span>
+                </div>
+                <p class="quest-desc">Train 5 times this week</p>
+                <div class="progress-bar" style="height: 25px; margin-top: 1rem;">
+                    <div class="progress-fill" style="width: 60%"></div>
+                    <div class="progress-text">3 / 5 DAYS</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SKILL TREE SECTION -->
+        <section id="skills" class="content-section">
+            <h2>🌳 SKILL TREE</h2>
+            <p style="color: var(--theme-gray); margin-bottom: 2rem;">Unlock new abilities and training programs as you level up!</p>
+
+            <div class="skill-tree">
+                <div class="skill-tier">
+                    <div class="skill-node unlocked">
+                        <div class="skill-name">BASIC BARBELL</div>
+                        <div class="skill-desc">Fundamental strength training</div>
+                        <div style="color: var(--theme-green); margin-top: 0.5rem;">✓ UNLOCKED</div>
+                    </div>
+                    <div class="skill-node unlocked">
+                        <div class="skill-name">CARDIO 101</div>
+                        <div class="skill-desc">Endurance foundations</div>
+                        <div style="color: var(--theme-green); margin-top: 0.5rem;">✓ UNLOCKED</div>
+                    </div>
+                </div>
+
+                <div class="skill-tier">
+                    <div class="skill-node available">
+                        <div class="skill-name">OLYMPIC LIFTS</div>
+                        <div class="skill-desc">Advanced power training</div>
+                        <div style="color: var(--theme-gold); margin-top: 0.5rem;">LEVEL 5 REQUIRED</div>
+                    </div>
+                    <div class="skill-node available">
+                        <div class="skill-name">HIIT MASTER</div>
+                        <div class="skill-desc">High-intensity intervals</div>
+                        <div style="color: var(--theme-gold); margin-top: 0.5rem;">LEVEL 5 REQUIRED</div>
+                    </div>
+                    <div class="skill-node available">
+                        <div class="skill-name">MOBILITY PRO</div>
+                        <div class="skill-desc">Advanced flexibility</div>
+                        <div style="color: var(--theme-gold); margin-top: 0.5rem;">LEVEL 5 REQUIRED</div>
+                    </div>
+                </div>
+
+                <div class="skill-tier">
+                    <div class="skill-node">
+                        <div class="skill-name">POWERLIFTING</div>
+                        <div class="skill-desc">Elite strength protocols</div>
+                        <div style="color: var(--theme-gray); margin-top: 0.5rem;">LEVEL 10 REQUIRED</div>
+                    </div>
+                    <div class="skill-node">
+                        <div class="skill-name">ENDURANCE ATHLETE</div>
+                        <div class="skill-desc">Marathon preparation</div>
+                        <div style="color: var(--theme-gray); margin-top: 0.5rem;">LEVEL 10 REQUIRED</div>
+                    </div>
+                </div>
+
+                <div class="skill-tier">
+                    <div class="skill-node">
+                        <div class="skill-name">LEGENDARY STATUS</div>
+                        <div class="skill-desc">Ultimate fitness mastery</div>
+                        <div style="color: var(--theme-gray); margin-top: 0.5rem;">LEVEL 20 REQUIRED</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACHIEVEMENTS SECTION -->
+        <section id="achievements" class="content-section">
+            <h2>🏆 ACHIEVEMENTS</h2>
+            <p style="color: var(--theme-gray); margin-bottom: 2rem;">Unlock badges by completing challenges and milestones!</p>
+
+            <div class="achievement-grid">
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">🎯</div>
+                    <div class="achievement-name">FIRST QUEST</div>
+                    <div class="achievement-desc">Complete your first workout</div>
+                </div>
+
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-name">WEEK WARRIOR</div>
+                    <div class="achievement-desc">7-day training streak</div>
+                </div>
+
+                <div class="achievement unlocked">
+                    <div class="achievement-icon">💪</div>
+                    <div class="achievement-name">STRENGTH SEEKER</div>
+                    <div class="achievement-desc">Reach Strength Level 10</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">⚡</div>
+                    <div class="achievement-name">SPEED DEMON</div>
+                    <div class="achievement-desc">Complete a 5K in under 25 minutes</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">🏃</div>
+                    <div class="achievement-name">MARATHON READY</div>
+                    <div class="achievement-desc">Complete 30-day consistency</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">👑</div>
+                    <div class="achievement-name">IRON THRONE</div>
+                    <div class="achievement-desc">Reach Level 20</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">🌟</div>
+                    <div class="achievement-name">PERFECT WEEK</div>
+                    <div class="achievement-desc">Complete all weekly challenges</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">🎖️</div>
+                    <div class="achievement-name">VETERAN</div>
+                    <div class="achievement-desc">100 total workouts completed</div>
+                </div>
+
+                <div class="achievement">
+                    <div class="achievement-icon" style="opacity: 0.3;">💎</div>
+                    <div class="achievement-name">LEGENDARY</div>
+                    <div class="achievement-desc">Unlock all skill tree nodes</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROFILE SECTION -->
+        <section id="profile" class="content-section">
+            <h2>📝 CHARACTER SHEET</h2>
+
+            <div class="character-sheet">
+                <div class="form-group">
+                    <label class="form-label">WARRIOR NAME</label>
+                    <input type="text" value="IronGamer42" id="profile-name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">CHARACTER CLASS</label>
+                    <select id="profile-class">
+                        <option value="warrior">⚔️ WARRIOR (Strength Focus)</option>
+                        <option value="ranger">🏹 RANGER (Endurance Focus)</option>
+                        <option value="monk">🧘 MONK (Mobility Focus)</option>
+                        <option value="berserker">🔥 BERSERKER (HIIT Focus)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">PRIMARY QUEST</label>
+                    <select id="profile-goal">
+                        <option value="strength">Build Maximum Strength</option>
+                        <option value="muscle">Gain Muscle Mass</option>
+                        <option value="fat-loss">Lose Body Fat</option>
+                        <option value="endurance">Improve Endurance</option>
+                        <option value="athletic">Athletic Performance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">TRAINING FREQUENCY</label>
+                    <select id="profile-frequency">
+                        <option value="3">3 Days / Week</option>
+                        <option value="4">4 Days / Week</option>
+                        <option value="5" selected>5 Days / Week</option>
+                        <option value="6">6 Days / Week</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">PREFERRED WEAPON (Equipment)</label>
+                    <select id="profile-equipment">
+                        <option value="full">Full Gym Access</option>
+                        <option value="home">Home Gym (Basic)</option>
+                        <option value="bodyweight">Bodyweight Only</option>
+                        <option value="minimal">Minimal Equipment</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">BACKSTORY (Optional)</label>
+                    <textarea rows="4" placeholder="Tell us about your fitness journey..."></textarea>
+                </div>
+
+                <button class="btn" style="width: 100%; margin-top: 1rem;">SAVE CHARACTER</button>
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 0.5rem;">RESET PROGRESS</button>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD SECTION -->
+        <section id="leaderboard" class="content-section">
+            <h2>🏅 LEGION LEADERBOARD</h2>
+            <p style="color: var(--theme-gray); margin-bottom: 2rem;">Top warriors in the guild this month</p>
+
+            <div class="leaderboard">
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#1</div>
+                    <div class="leaderboard-name">🥇 DragonSlayer99</div>
+                    <div class="leaderboard-score">12,450 XP</div>
+                </div>
+
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#2</div>
+                    <div class="leaderboard-name">🥈 IronMaiden</div>
+                    <div class="leaderboard-score">11,200 XP</div>
+                </div>
+
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#3</div>
+                    <div class="leaderboard-name">🥉 BeastMode_Alpha</div>
+                    <div class="leaderboard-score">10,800 XP</div>
+                </div>
+
+                <div class="leaderboard-entry" style="background-color: rgba(199, 0, 57, 0.3);">
+                    <div class="leaderboard-rank">#7</div>
+                    <div class="leaderboard-name">👤 IronGamer42 (YOU)</div>
+                    <div class="leaderboard-score">8,350 XP</div>
+                </div>
+
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#8</div>
+                    <div class="leaderboard-name">PixelWarrior</div>
+                    <div class="leaderboard-score">8,100 XP</div>
+                </div>
+
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#9</div>
+                    <div class="leaderboard-name">CodeAndLift</div>
+                    <div class="leaderboard-score">7,900 XP</div>
+                </div>
+
+                <div class="leaderboard-entry">
+                    <div class="leaderboard-rank">#10</div>
+                    <div class="leaderboard-name">GymChimera</div>
+                    <div class="leaderboard-score">7,650 XP</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Background Canvas Animation
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Particle system
+        const particles = Array(100).fill().map(() => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: Math.random() * 0.5 + 0.2
+        }));
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#C70039';
+
+            particles.forEach(particle => {
+                ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+
+                particle.x += particle.speedX;
+                particle.y += particle.speedY;
+
+                if (particle.y > canvas.height) {
+                    particle.y = 0;
+                    particle.x = Math.random() * canvas.width;
+                }
+
+                if (particle.x < 0 || particle.x > canvas.width) {
+                    particle.speedX *= -1;
+                }
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+
+        drawParticles();
+
+        // Sound Effects
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep(frequency = 440, duration = 0.1) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            oscillator.type = 'square';
+
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playLevelUp() {
+            playBeep(523.25, 0.2);
+            setTimeout(() => playBeep(659.25, 0.2), 200);
+            setTimeout(() => playBeep(783.99, 0.3), 400);
+        }
+
+        // Navigation
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('.content-section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const target = button.dataset.target;
+
+                // Update active button
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update active section
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === target) {
+                        section.classList.add('active');
+                    }
+                });
+
+                playBeep(440, 0.1);
+            });
+        });
+
+        // Quest completion
+        document.querySelectorAll('.quest-card .btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const card = e.target.closest('.quest-card');
+
+                if (!card.classList.contains('completed')) {
+                    card.classList.add('completed');
+                    button.textContent = '✓ COMPLETED';
+                    button.style.backgroundColor = 'var(--theme-green)';
+
+                    // Add XP
+                    const currentXP = parseInt(document.getElementById('xp-current').textContent);
+                    const newXP = currentXP + 150;
+                    document.getElementById('xp-current').textContent = newXP;
+
+                    const xpNeeded = parseInt(document.getElementById('xp-needed').textContent);
+                    const percentage = (newXP / xpNeeded) * 100;
+                    document.getElementById('xp-bar').style.width = percentage + '%';
+
+                    // Check for level up
+                    if (newXP >= xpNeeded) {
+                        setTimeout(() => {
+                            const currentLevel = parseInt(document.getElementById('player-level').textContent);
+                            document.getElementById('player-level').textContent = currentLevel + 1;
+                            document.getElementById('xp-current').textContent = 0;
+                            document.getElementById('xp-bar').style.width = '0%';
+                            playLevelUp();
+                            alert('⚡ LEVEL UP! ⚡\nYou reached level ' + (currentLevel + 1) + '!');
+                        }, 500);
+                    } else {
+                        playBeep(659.25, 0.2);
+                    }
+                }
+            });
+        });
+
+        // Skill tree interaction
+        document.querySelectorAll('.skill-node.available').forEach(node => {
+            node.addEventListener('click', () => {
+                if (confirm('Unlock this skill? This will spend 1 Skill Point.')) {
+                    node.classList.remove('available');
+                    node.classList.add('unlocked');
+                    node.querySelector('div:last-child').textContent = '✓ UNLOCKED';
+                    node.querySelector('div:last-child').style.color = 'var(--theme-green)';
+                    playLevelUp();
+                }
+            });
+        });
+
+        // Profile save
+        document.querySelector('.character-sheet .btn').addEventListener('click', () => {
+            const name = document.getElementById('profile-name').value;
+            document.getElementById('player-name').textContent = name;
+            playBeep(523.25, 0.2);
+            alert('✓ Character sheet saved!');
+        });
+    </script>
+</body>
+</html>

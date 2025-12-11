@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Legion Command Center - Digital Fitness Empire Management System">
+    <title>Legion Command Center v2.0</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS - CRITICAL FIX -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* ==================== THEME SYSTEM ==================== */
+        :root {
+            --theme-red: #C70039;
+            --theme-black: #000000;
+            --theme-white: #FFFFFF;
+            --theme-gray: #888888;
+            --theme-dark-gray: #333333;
+            --theme-light-gray: #DDDDDD;
+            --theme-red-dark: #900028;
+            --theme-red-light: #FF3355;
+            --transition-speed: 0.3s;
+        }
+
+        /* ==================== BASE STYLES ==================== */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--theme-white);
+            color: var(--theme-black);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ==================== CANVAS BACKGROUND ==================== */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* ==================== UTILITY CLASSES ==================== */
+        .pixel-border {
+            border: 4px solid var(--theme-black);
+            box-shadow: 
+                0 0 0 4px var(--theme-white), 
+                0 0 0 8px var(--theme-black);
+            background-color: var(--theme-white);
+        }
+
+        .pixel-border-inner {
+            border: 2px solid var(--theme-black);
+        }
+
+        .retro-header {
+            color: var(--theme-red);
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            line-height: 1.4;
+        }
+
+        .terminal-text {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .nav-item {
+            color: var(--theme-black);
+            border: 2px solid transparent;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            background-color: transparent;
+            user-select: none;
+        }
+
+        .nav-item:focus {
+            outline: 3px solid var(--theme-red);
+            outline-offset: 2px;
+        }
+
+        .nav-item.active {
+            background-color: var(--theme-red);
+            color: var(--theme-white);
+            border-color: var(--theme-black);
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #FFE5E5;
+            border-color: var(--theme-gray);
+        }
+
+        .nav-item::before {
+            content: '▶';
+            opacity: 0;
+            margin-right: 0.5rem;
+            transition: opacity var(--transition-speed);
+        }
+
+        .nav-item.active::before {
+            opacity: 1;
+        }
+
+        /* ==================== CONTENT MODULES ==================== */
+        .content-module {
+            display: none;
+            padding: 1.5rem;
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+
+        .content-module.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== CRT EFFECTS ==================== */
+        #main-content {
+            animation: crt-brightness-flicker 6s infinite;
+        }
+
+        @keyframes crt-brightness-flicker {
+            0%, 96%, 100% { opacity: 1; }
+            96.5% { opacity: 0.92; }
+            97% { opacity: 0.95; }
+        }
+
+        /* Scanline effect overlay */
+        #main-content::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.03) 0px,
+                rgba(0, 0, 0, 0.03) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        /* ==================== CARDS ==================== */
+        .terminal-card {
+            border: 2px solid var(--theme-black);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background-color: var(--theme-white);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+        }
+
+        .terminal-card:hover {
+            border-color: var(--theme-red);
+            box-shadow: 4px 4px 0 rgba(199, 0, 57, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .terminal-card:focus-within {
+            outline: 3px solid var(--theme-red);
+            outline-offset: 2px;
+        }
+
+        .terminal-card h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .terminal-detail {
+            border: 3px solid var(--theme-black);
+            padding: 1.5rem;
+            margin-top: 1rem;
+            background-color: #FAFAFA;
+            animation: expandIn 0.3s ease-out;
+        }
+
+        @keyframes expandIn {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                padding-top: 1.5rem;
+                padding-bottom: 1.5rem;
+            }
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .ai-button {
+            background-color: var(--theme-red);
+            color: var(--theme-white);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border: 3px solid var(--theme-black);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-button:hover:not(:disabled) {
+            background-color: var(--theme-black);
+            color: var(--theme-red);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-button:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ai-button:focus {
+            outline: 3px solid var(--theme-red-light);
+            outline-offset: 3px;
+        }
+
+        .back-button {
+            background-color: var(--theme-gray);
+            font-size: 0.65rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .back-button:hover {
+            background-color: var(--theme-dark-gray);
+            color: var(--theme-white);
+        }
+
+        /* ==================== FORM ELEMENTS ==================== */
+        textarea, 
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            border: 2px solid var(--theme-black);
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.95rem;
+            background-color: var(--theme-white);
+            transition: border-color var(--transition-speed);
+        }
+
+        textarea:focus,
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--theme-red);
+            box-shadow: 0 0 0 3px rgba(199, 0, 57, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* ==================== PROGRESS & STATUS ==================== */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.online {
+            background-color: #00FF00;
+        }
+
+        .status-indicator.processing {
+            background-color: #FFAA00;
+        }
+
+        .status-indicator.offline {
+            background-color: #FF0000;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            border: 2px solid var(--theme-black);
+            background-color: var(--theme-light-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--theme-red);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.2) 10px,
+                rgba(255,255,255,0.2) 20px
+            );
+            animation: barberPole 1s linear infinite;
+        }
+
+        @keyframes barberPole {
+            0% { background-position: 0 0; }
+            100% { background-position: 28px 0; }
+        }
+
+        /* ==================== RESULTS DISPLAY ==================== */
+        .result-box {
+            border: 2px dashed var(--theme-gray);
+            padding: 1rem;
+            margin-top: 1rem;
+            background-color: #F5F5F5;
+            min-height: 60px;
+        }
+
+        .result-box.success {
+            border-color: #00AA00;
+            background-color: #E8F5E8;
+        }
+
+        .result-box.error {
+            border-color: var(--theme-red);
+            background-color: #FFE8E8;
+        }
+
+        /* ==================== STATS GRID ==================== */
+        .stat-card {
+            border: 2px solid var(--theme-black);
+            padding: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--theme-red);
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--theme-gray);
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* ==================== TOOLTIPS ==================== */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted var(--theme-gray);
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--theme-black);
+            color: var(--theme-white);
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-speed);
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* ==================== LOADING STATES ==================== */
+        .loading-spinner {
+            border: 3px solid var(--theme-light-gray);
+            border-top: 3px solid var(--theme-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==================== QUIZ STYLES ==================== */
+        .quiz-option {
+            border: 2px solid var(--theme-black);
+            padding: 1rem;
+            margin: 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            background-color: #F0F0F0;
+            border-color: var(--theme-red);
+        }
+
+        .quiz-option.correct {
+            background-color: #D4EDDA;
+            border-color: #28A745;
+        }
+
+        .quiz-option.incorrect {
+            background-color: #F8D7DA;
+            border-color: #DC3545;
+        }
+
+        /* ==================== RESPONSIVE DESIGN ==================== */
+        @media (max-width: 640px) {
+            body {
+                font-size: 14px;
+            }
+
+            .retro-header {
+                font-size: 1.25rem !important;
+            }
+
+            .nav-item {
+                padding: 0.5rem 0.75rem;
+                font-size: 1rem;
+            }
+
+            .ai-button {
+                font-size: 0.65rem;
+                padding: 0.6rem 1rem;
+            }
+
+            .terminal-card {
+                padding: 1rem;
+            }
+
+            #bg-canvas {
+                display: none;
+            }
+
+            .pixel-border {
+                box-shadow: none;
+                border: 2px solid var(--theme-black);
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ==================== ACCESSIBILITY ==================== */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--theme-red);
+            color: var(--theme-white);
+            padding: 8px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* ==================== PRINT STYLES ==================== */
+        @media print {
+            #bg-canvas,
+            nav,
+            .ai-button {
+                display: none;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Background Canvas -->
+    <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+    <!-- Main Container -->
+    <div class="flex flex-col sm:flex-row max-w-6xl mx-auto my-4 pixel-border min-h-screen">
+        <!-- Navigation Sidebar -->
+        <nav id="main-nav" class="p-4 border-b-4 sm:border-b-0 sm:border-r-4 border-black sm:w-64 bg-white" role="navigation" aria-label="Main navigation">
+            <h1 class="retro-header text-2xl mb-6 hidden sm:block">COMMAND</h1>
+            
+            <!-- System Status -->
+            <div class="mb-4 text-sm">
+                <span class="status-indicator online" role="status" aria-label="System online"></span>
+                <span class="terminal-text">SYSTEM ONLINE</span>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="flex flex-row sm:flex-col gap-2" role="menu">
+                <button class="nav-item active" data-target="dashboard" role="menuitem" tabindex="0">
+                    DASHBOARD
+                </button>
+                <button class="nav-item" data-target="strategy-forge" role="menuitem" tabindex="0">
+                    STRATEGY FORGE
+                </button>
+                <button class="nav-item" data-target="intel-map" role="menuitem" tabindex="0">
+                    INTEL MAP
+                </button>
+                <button class="nav-item" data-target="training-sim" role="menuitem" tabindex="0">
+                    TRAINING SIM
+                </button>
+                <button class="nav-item" data-target="field-manual" role="menuitem" tabindex="0">
+                    FIELD MANUAL
+                </button>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="mt-6 pt-6 border-t-2 border-gray-300 hidden sm:block">
+                <div class="text-xs terminal-text">
+                    <div class="mb-2">
+                        <span class="text-gray-600">SESSIONS:</span>
+                        <span class="text-red-600 font-bold" id="session-count">0</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-gray-600">QUERIES:</span>
+                        <span class="text-red-600 font-bold" id="query-count">0</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">UPTIME:</span>
+                        <span class="text-red-600 font-bold" id="uptime">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 p-6 overflow-y-auto" style="max-height: 95vh;" aria-live="polite" role="main">
+            
+            <!-- DASHBOARD MODULE -->
+            <section id="dashboard" class="content-module active">
+                <h2 class="retro-header text-4xl mb-6">SYSTEM ONLINE</h2>
+                <p class="text-lg mb-6">Welcome, Commander. This is your operational hub for building a digital fitness empire.</p>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Active Campaigns</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Strategies Forged</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Intel Reports</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Training Complete</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="terminal-card">
+                    <h3 class="retro-header text-xl">QUICK DEPLOY</h3>
+                    <p class="mb-4">Launch into your most critical operations:</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <button class="ai-button" onclick="LegionOS.navigateTo('strategy-forge')">
+                            ⚔️ FORGE STRATEGY
+                        </button>
+                        <button class="ai-button" onclick="LegionOS.navigateTo('training-sim')">
+                            🎯 START TRAINING
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="terminal-card mt-4">
+                    <h3 class="retro-header text-xl">RECENT OPERATIONS</h3>
+                    <div id="recent-activity" class="terminal-text">
+                        <p class="text-gray-600">No recent activity. Begin your mission above.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STRATEGY FORGE MODULE -->
+            <section id="strategy-forge" class="content-module">
+                <h2 class="retro-header text-4xl mb-6">STRATEGY FORGE</h2>
+                <p class="text-lg mb-6">Craft your battle plan. Define your positioning, offers, and tactical approach.</p>
+
+                <!-- Terminal Hub -->
+                <div id="terminal-hub" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="terminal-card" data-terminal="foundation" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">🎯 HERO CLASS</h3>
+                        <p class="terminal-text">Define your target avatar and unique positioning.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+                    
+                    <div class="terminal-card" data-terminal="monetization" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">💰 LOOT TABLE</h3>
+                        <p class="terminal-text">Structure your offer ladder and revenue streams.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+
+                    <div class="terminal-card" data-terminal="content" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">📡 CONTENT PROTOCOL</h3>
+                        <p class="terminal-text">Plan your content strategy and distribution.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+
+                    <div class="terminal-card" data-terminal="growth" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">📈 GROWTH ENGINE</h3>
+                        <p class="terminal-text">Design your acquisition and scaling systems.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+
+                    <div class="terminal-card" data-terminal="automation" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">🤖 AUTO-SYSTEMS</h3>
+                        <p class="terminal-text">Build automated funnels and sequences.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+
+                    <div class="terminal-card" data-terminal="community" tabindex="0" role="button">
+                        <h3 class="retro-header text-lg">👥 LEGION BUILDER</h3>
+                        <p class="terminal-text">Cultivate and activate your tribe.</p>
+                        <div class="text-xs text-gray-600 mt-2">Click to configure →</div>
+                    </div>
+                </div>
+
+                <!-- Terminal Detail View -->
+                <div id="terminal-content" role="region" aria-live="polite"></div>
+            </section>
+
+            <!-- INTEL MAP MODULE -->
+            <section id="intel-map" class="content-module">
+                <h2 class="retro-header text-4xl mb-6">INTEL MAP</h2>
+                <p class="text-lg mb-6">Visual intelligence on competitive landscape and market positioning.</p>
+
+                <div class="terminal-card">
+                    <h3 class="retro-header text-xl mb-4">MARKET QUADRANTS</h3>
+                    <div class="border-2 border-black p-4 bg-gray-50">
+                        <div class="grid grid-cols-2 gap-4 h-96">
+                            <!-- Quadrant 1: High Ticket, High Touch -->
+                            <div class="border-2 border-black p-4 bg-red-50">
+                                <h4 class="font-bold text-sm mb-2">HIGH TICKET / HIGH TOUCH</h4>
+                                <ul class="text-xs terminal-text">
+                                    <li>• 1-on-1 Coaching ($2K-10K)</li>
+                                    <li>• VIP Masterminds</li>
+                                    <li>• Done-For-You Services</li>
+                                </ul>
+                            </div>
+                            <!-- Quadrant 2: High Ticket, Low Touch -->
+                            <div class="border-2 border-black p-4 bg-yellow-50">
+                                <h4 class="font-bold text-sm mb-2">HIGH TICKET / LOW TOUCH</h4>
+                                <ul class="text-xs terminal-text">
+                                    <li>• Group Programs ($500-2K)</li>
+                                    <li>• Cohort-Based Courses</li>
+                                    <li>• Certification Programs</li>
+                                </ul>
+                            </div>
+                            <!-- Quadrant 3: Low Ticket, High Touch -->
+                            <div class="border-2 border-black p-4 bg-blue-50">
+                                <h4 class="font-bold text-sm mb-2">LOW TICKET / HIGH TOUCH</h4>
+                                <ul class="text-xs terminal-text">
+                                    <li>• Monthly Memberships ($50-200)</li>
+                                    <li>• Community + Support</li>
+                                    <li>• Small Group Coaching</li>
+                                </ul>
+                            </div>
+                            <!-- Quadrant 4: Low Ticket, Low Touch -->
+                            <div class="border-2 border-black p-4 bg-green-50">
+                                <h4 class="font-bold text-sm mb-2">LOW TICKET / LOW TOUCH</h4>
+                                <ul class="text-xs terminal-text">
+                                    <li>• Digital Products ($20-100)</li>
+                                    <li>• Self-Paced Courses</li>
+                                    <li>• Templates & Guides</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm mt-4 text-gray-600">
+                        <strong>Strategic Note:</strong> Most successful creators operate across 2-3 quadrants simultaneously.
+                    </p>
+                </div>
+
+                <div class="terminal-card mt-4">
+                    <h3 class="retro-header text-xl mb-4">POSITIONING MATRIX</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-2 border-black">
+                            <thead>
+                                <tr class="bg-red-600 text-white">
+                                    <th class="border border-black p-2 text-left">Archetype</th>
+                                    <th class="border border-black p-2 text-left">Core Hook</th>
+                                    <th class="border border-black p-2 text-left">Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody class="terminal-text">
+                                <tr>
+                                    <td class="border border-black p-2"><strong>The Transformer</strong></td>
+                                    <td class="border border-black p-2">"From X to Y in Z days"</td>
+                                    <td class="border border-black p-2">Weight loss, body recomp</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-black p-2"><strong>The Specialist</strong></td>
+                                    <td class="border border-black p-2">"The only program for [specific niche]"</td>
+                                    <td class="border border-black p-2">Athletes, conditions, goals</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-black p-2"><strong>The Systematizer</strong></td>
+                                    <td class="border border-black p-2">"The [X]-step system"</td>
+                                    <td class="border border-black p-2">Busy professionals</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="border border-black p-2"><strong>The Lifestyle Guide</strong></td>
+                                    <td class="border border-black p-2">"Fitness that fits your life"</td>
+                                    <td class="border border-black p-2">Sustainable habits</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TRAINING SIM MODULE -->
+            <section id="training-sim" class="content-module">
+                <h2 class="retro-header text-4xl mb-6">TRAINING SIMULATOR</h2>
+                <p class="text-lg mb-6">Test your strategic knowledge. Complete missions to earn intel.</p>
+
+                <div id="quiz-container">
+                    <!-- Quiz will be dynamically loaded here -->
+                </div>
+
+                <div class="terminal-card">
+                    <h3 class="retro-header text-xl mb-4">AVAILABLE MISSIONS</h3>
+                    <div class="space-y-2">
+                        <button class="ai-button w-full text-left" onclick="LegionOS.loadQuiz('positioning')">
+                            📍 MISSION 1: Positioning Fundamentals
+                        </button>
+                        <button class="ai-button w-full text-left" onclick="LegionOS.loadQuiz('monetization')">
+                            💰 MISSION 2: Monetization Strategy
+                        </button>
+                        <button class="ai-button w-full text-left" onclick="LegionOS.loadQuiz('content')">
+                            📡 MISSION 3: Content Distribution
+                        </button>
+                        <button class="ai-button w-full text-left" onclick="LegionOS.loadQuiz('growth')">
+                            📈 MISSION 4: Growth Mechanics
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-card mt-4">
+                    <h3 class="retro-header text-xl mb-4">TRAINING PROGRESS</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Strategic Knowledge</span>
+                                <span id="knowledge-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="knowledge-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span>Missions Completed</span>
+                                <span id="missions-completed">0/4</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="missions-progress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FIELD MANUAL MODULE -->
+            <section id="field-manual" class="content-module">
+                <h2 class="retro-header text-4xl mb-6">FIELD MANUAL</h2>
+                <p class="text-lg mb-6">Strategic documentation and tactical playbooks.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="terminal-card">
+                        <h3 class="retro-header text-lg mb-3">📋 FOUNDATION DOCS</h3>
+                        <ul class="space-y-2 terminal-text">
+                            <li><a href="#" class="text-red-600 hover:underline">• Mission Command Overview</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Strategic Framework Guide</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Positioning Playbook</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Market Analysis Template</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="terminal-card">
+                        <h3 class="retro-header text-lg mb-3">🎯 TACTICAL GUIDES</h3>
+                        <ul class="space-y-2 terminal-text">
+                            <li><a href="#" class="text-red-600 hover:underline">• Content Calendar System</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Lead Magnet Creation</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Email Sequence Templates</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Launch Checklist</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="terminal-card">
+                        <h3 class="retro-header text-lg mb-3">⚙️ SYSTEMS & TOOLS</h3>
+                        <ul class="space-y-2 terminal-text">
+                            <li><a href="#" class="text-red-600 hover:underline">• Tech Stack Recommendations</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Automation Workflows</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Analytics Dashboard Setup</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• CRM Integration Guide</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="terminal-card">
+                        <h3 class="retro-header text-lg mb-3">📊 CASE STUDIES</h3>
+                        <ul class="space-y-2 terminal-text">
+                            <li><a href="#" class="text-red-600 hover:underline">• $0 to $10K/mo in 90 Days</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Scaling to 6-Figures</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Failed Launches & Lessons</a></li>
+                            <li><a href="#" class="text-red-600 hover:underline">• Pivots That Worked</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="terminal-card mt-4">
+                    <h3 class="retro-header text-xl mb-4">RESOURCE LIBRARY</h3>
+                    <div class="space-y-2">
+                        <button class="ai-button w-full" onclick="alert('Download feature coming soon!')">
+                            ⬇️ DOWNLOAD ALL TEMPLATES
+                        </button>
+                        <button class="ai-button w-full" onclick="alert('Export feature coming soon!')">
+                            📤 EXPORT STRATEGY REPORT
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // ==================== LEGION OS - CORE SYSTEM ====================
+        const LegionOS = {
+            // System state
+            state: {
+                audioContext: null,
+                audioEnabled: false,
+                sessionStart: Date.now(),
+                sessionCount: 0,
+                queryCount: 0,
+                trainingProgress: {
+                    positioning: false,
+                    monetization: false,
+                    content: false,
+                    growth: false
+                },
+                userData: {}
+            },
+
+            // Initialize system
+            init() {
+                console.log('🔴 LEGION OS INITIALIZING...');
+                this.initCanvas();
+                this.initAudio();
+                this.initNavigation();
+                this.initTerminals();
+                this.initUptime();
+                this.loadUserData();
+                this.updateStats();
+                console.log('✅ LEGION OS ONLINE');
+            },
+
+            // Canvas background animation with cleanup
+            initCanvas() {
+                const canvas = document.getElementById('bg-canvas');
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+
+                let animationFrameId = null;
+                const stars = [];
+
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+
+                // Debounced resize
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(resizeCanvas, 250);
+                });
+
+                resizeCanvas();
+
+                // Create stars
+                const starCount = window.innerWidth < 640 ? 25 : 50;
+                for (let i = 0; i < starCount; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        size: Math.random() * 2 + 1,
+                        speed: Math.random() * 0.3 + 0.1
+                    });
+                }
+
+                function drawStars() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#C70039';
+                    
+                    stars.forEach(star => {
+                        ctx.fillRect(star.x, star.y, star.size, star.size);
+                        star.y += star.speed;
+                        if (star.y > canvas.height) {
+                            star.y = 0;
+                            star.x = Math.random() * canvas.width;
+                        }
+                    });
+                    
+                    animationFrameId = requestAnimationFrame(drawStars);
+                }
+
+                drawStars();
+
+                // Cleanup function
+                window.addEventListener('beforeunload', () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                });
+            },
+
+            // Audio system with user interaction requirement
+            initAudio() {
+                try {
+                    this.state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Resume audio context on first user interaction
+                    const enableAudio = () => {
+                        if (this.state.audioContext && this.state.audioContext.state === 'suspended') {
+                            this.state.audioContext.resume().then(() => {
+                                this.state.audioEnabled = true;
+                                console.log('🔊 Audio enabled');
+                            });
+                        }
+                        document.removeEventListener('click', enableAudio);
+                        document.removeEventListener('keydown', enableAudio);
+                    };
+
+                    document.addEventListener('click', enableAudio);
+                    document.addEventListener('keydown', enableAudio);
+                } catch (error) {
+                    console.warn('Audio not supported:', error);
+                    this.state.audioEnabled = false;
+                }
+            },
+
+            // Play sound effect
+            playBeep(frequency = 440, duration = 0.1) {
+                if (!this.state.audioEnabled || !this.state.audioContext) return;
+
+                try {
+                    const oscillator = this.state.audioContext.createOscillator();
+                    const gainNode = this.state.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.state.audioContext.destination);
+                    
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(frequency, this.state.audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0.1, this.state.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.state.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.state.audioContext.currentTime);
+                    oscillator.stop(this.state.audioContext.currentTime + duration);
+                } catch (error) {
+                    console.warn('Audio playback failed:', error);
+                }
+            },
+
+            // Navigation system with keyboard support
+            initNavigation() {
+                const navItems = document.querySelectorAll('.nav-item');
+                const contentModules = document.querySelectorAll('.content-module');
+
+                navItems.forEach((item, index) => {
+                    // Click handler
+                    item.addEventListener('click', () => {
+                        this.navigateTo(item.dataset.target);
+                    });
+
+                    // Keyboard handler
+                    item.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.navigateTo(item.dataset.target);
+                        } else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            const nextItem = navItems[Math.min(index + 1, navItems.length - 1)];
+                            nextItem.focus();
+                        } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            const prevItem = navItems[Math.max(index - 1, 0)];
+                            prevItem.focus();
+                        }
+                    });
+                });
+            },
+
+            // Navigate to section
+            navigateTo(targetId) {
+                const navItems = document.querySelectorAll('.nav-item');
+                const contentModules = document.querySelectorAll('.content-module');
+
+                navItems.forEach(item => {
+                    if (item.dataset.target === targetId) {
+                        item.classList.add('active');
+                        item.setAttribute('aria-current', 'page');
+                    } else {
+                        item.classList.remove('active');
+                        item.removeAttribute('aria-current');
+                    }
+                });
+
+                contentModules.forEach(module => {
+                    if (module.id === targetId) {
+                        module.classList.add('active');
+                        // Announce to screen readers
+                        module.setAttribute('aria-live', 'polite');
+                    } else {
+                        module.classList.remove('active');
+                    }
+                });
+
+                this.playBeep(550, 0.08);
+                this.updateStats();
+            },
+
+            // Terminal system
+            initTerminals() {
+                const terminalCards = document.querySelectorAll('#terminal-hub .terminal-card');
+                
+                terminalCards.forEach(card => {
+                    // Click handler
+                    card.addEventListener('click', () => {
+                        this.loadTerminal(card.dataset.terminal);
+                    });
+
+                    // Keyboard handler
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.loadTerminal(card.dataset.terminal);
+                        }
+                    });
+                });
+            },
+
+            // Load terminal detail view
+            loadTerminal(terminalId) {
+                const terminalContent = document.getElementById('terminal-content');
+                const templates = this.getTerminalTemplates();
+
+                if (!templates[terminalId]) {
+                    console.error('Terminal not found:', terminalId);
+                    return;
+                }
+
+                // Clear previous content and event listeners
+                terminalContent.innerHTML = templates[terminalId];
+                
+                // Scroll to terminal
+                terminalContent.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                // Initialize terminal controls
+                this.initTerminalControls(terminalId);
+                
+                this.playBeep(660, 0.08);
+            },
+
+            // Terminal templates
+            getTerminalTemplates() {
+                return {
+                    foundation: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">🎯 HERO CLASS CONFIGURATION</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Define your ideal client avatar and unique market position.</p>
+                            
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Target Avatar Description:</label>
+                                <textarea id="foundation-input" rows="4" placeholder="Example: High-stress tech workers (25-40) who want to build muscle and reduce anxiety without spending hours in the gym. They value efficiency, science-backed approaches, and sustainable habits over quick fixes."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Unique Positioning Angle:</label>
+                                <input type="text" id="foundation-angle" placeholder="e.g., 'The only 30-minute program designed for engineers'">
+                            </div>
+
+                            <button class="ai-button" id="foundation-query">
+                                🔮 GENERATE POSITIONING STRATEGY
+                            </button>
+                            
+                            <div id="foundation-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `,
+                    monetization: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">💰 LOOT TABLE CONFIGURATION</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Design your offer ladder from free lead magnets to premium programs.</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block font-bold mb-2">Free Lead Magnet:</label>
+                                    <input type="text" id="monetization-free" placeholder="e.g., 7-Day Stress-Free Strength Guide (PDF)">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-2">Tripwire Offer ($7-47):</label>
+                                    <input type="text" id="monetization-tripwire" placeholder="e.g., 30-Minute Workout Library ($27)">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-2">Core Offer ($100-500):</label>
+                                    <input type="text" id="monetization-core" placeholder="e.g., 12-Week Transformation Program ($297)">
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-2">Premium Offer ($1K+):</label>
+                                    <input type="text" id="monetization-premium" placeholder="e.g., 1-on-1 Elite Coaching (Starting at $2K)">
+                                </div>
+                            </div>
+
+                            <button class="ai-button" id="monetization-query">
+                                🔮 GENERATE OFFER STRATEGY
+                            </button>
+                            
+                            <div id="monetization-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `,
+                    content: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">📡 CONTENT PROTOCOL</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Define your content pillars and distribution strategy.</p>
+                            
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Primary Platform:</label>
+                                <select id="content-platform" class="w-full">
+                                    <option value="">Select platform...</option>
+                                    <option value="instagram">Instagram</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="tiktok">TikTok</option>
+                                    <option value="twitter">Twitter/X</option>
+                                    <option value="linkedin">LinkedIn</option>
+                                    <option value="email">Email Newsletter</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Content Pillars (3-5 themes):</label>
+                                <textarea id="content-pillars" rows="3" placeholder="Example:
+1. Quick workout demos (30 sec)
+2. Science-backed tips
+3. Mindset & motivation
+4. Client transformations
+5. Behind-the-scenes"></textarea>
+                            </div>
+
+                            <button class="ai-button" id="content-query">
+                                🔮 GENERATE CONTENT CALENDAR
+                            </button>
+                            
+                            <div id="content-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `,
+                    growth: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">📈 GROWTH ENGINE</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Design your acquisition funnel and scaling strategy.</p>
+                            
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Current Audience Size:</label>
+                                <input type="number" id="growth-current" placeholder="e.g., 1000">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">90-Day Growth Goal:</label>
+                                <input type="number" id="growth-goal" placeholder="e.g., 5000">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Traffic Sources (current or planned):</label>
+                                <textarea id="growth-sources" rows="3" placeholder="Example:
+- Organic social media
+- YouTube SEO
+- Paid ads (Facebook/Instagram)
+- Partnerships/collabs
+- SEO/blog content"></textarea>
+                            </div>
+
+                            <button class="ai-button" id="growth-query">
+                                🔮 GENERATE GROWTH PLAN
+                            </button>
+                            
+                            <div id="growth-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `,
+                    automation: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">🤖 AUTO-SYSTEMS</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Build automated sequences and systems that work while you sleep.</p>
+                            
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Email Sequence Purpose:</label>
+                                <select id="automation-type" class="w-full">
+                                    <option value="">Select type...</option>
+                                    <option value="welcome">Welcome Series</option>
+                                    <option value="nurture">Lead Nurture</option>
+                                    <option value="sales">Sales Sequence</option>
+                                    <option value="onboarding">Client Onboarding</option>
+                                    <option value="reengagement">Re-engagement Campaign</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Sequence Length (days):</label>
+                                <input type="number" id="automation-length" placeholder="e.g., 7" min="3" max="30">
+                            </div>
+
+                            <button class="ai-button" id="automation-query">
+                                🔮 GENERATE EMAIL SEQUENCE
+                            </button>
+                            
+                            <div id="automation-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `,
+                    community: `
+                        <div class="terminal-detail">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="retro-header text-2xl">👥 LEGION BUILDER</h3>
+                                <button class="back-button ai-button" onclick="LegionOS.closeTerminal()">
+                                    ← BACK
+                                </button>
+                            </div>
+                            <p class="mb-4">Cultivate a loyal tribe and activate superfans.</p>
+                            
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Community Platform:</label>
+                                <select id="community-platform" class="w-full">
+                                    <option value="">Select platform...</option>
+                                    <option value="facebook">Facebook Group</option>
+                                    <option value="discord">Discord Server</option>
+                                    <option value="circle">Circle Community</option>
+                                    <option value="slack">Slack Workspace</option>
+                                    <option value="mighty">Mighty Networks</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block font-bold mb-2">Engagement Strategies:</label>
+                                <textarea id="community-strategies" rows="4" placeholder="Example:
+- Weekly challenges with prizes
+- Monthly guest expert Q&As
+- Member spotlights/wins
+- Daily accountability check-ins
+- Exclusive content drops"></textarea>
+                            </div>
+
+                            <button class="ai-button" id="community-query">
+                                🔮 GENERATE COMMUNITY PLAN
+                            </button>
+                            
+                            <div id="community-results" class="result-box mt-4" style="display: none;">
+                                <!-- Results will appear here -->
+                            </div>
+                        </div>
+                    `
+                };
+            },
+
+            // Initialize terminal controls
+            initTerminalControls(terminalId) {
+                const queryButton = document.getElementById(`${terminalId}-query`);
+                const resultsDiv = document.getElementById(`${terminalId}-results`);
+
+                if (!queryButton || !resultsDiv) return;
+
+                // Remove old listeners by cloning
+                const newButton = queryButton.cloneNode(true);
+                queryButton.parentNode.replaceChild(newButton, queryButton);
+
+                newButton.addEventListener('click', () => {
+                    this.processTerminalQuery(terminalId);
+                });
+            },
+
+            // Process terminal query (mock API call)
+            async processTerminalQuery(terminalId) {
+                const resultsDiv = document.getElementById(`${terminalId}-results`);
+                const button = document.getElementById(`${terminalId}-query`);
+
+                if (!resultsDiv || !button) return;
+
+                // Collect inputs
+                const inputs = this.collectTerminalInputs(terminalId);
+
+                if (!this.validateInputs(inputs)) {
+                    resultsDiv.style.display = 'block';
+                    resultsDiv.className = 'result-box error';
+                    resultsDiv.innerHTML = '<p class="text-red-600"><strong>⚠️ ERROR:</strong> Please fill in all required fields.</p>';
+                    this.playBeep(200, 0.2);
+                    return;
+                }
+
+                // Show loading state
+                button.disabled = true;
+                button.textContent = '⏳ PROCESSING...';
+                resultsDiv.style.display = 'block';
+                resultsDiv.className = 'result-box';
+                resultsDiv.innerHTML = '<div class="loading-spinner"></div><p class="text-center mt-2">Oracle computing strategy...</p>';
+
+                this.playBeep(880, 0.05);
+
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Generate mock response
+                const response = this.generateMockResponse(terminalId, inputs);
+
+                // Display results
+                resultsDiv.className = 'result-box success';
+                resultsDiv.innerHTML = response;
+
+                // Reset button
+                button.disabled = false;
+                button.textContent = '🔮 GENERATE AGAIN';
+
+                // Update stats
+                this.state.queryCount++;
+                this.updateStats();
+                this.saveUserData();
+
+                this.playBeep(1100, 0.1);
+
+                // Add to recent activity
+                this.addRecentActivity(`Strategy generated: ${terminalId.toUpperCase()}`);
+            },
+
+            // Collect inputs from terminal
+            collectTerminalInputs(terminalId) {
+                const inputs = {};
+                const allInputs = document.querySelectorAll(`#terminal-content input, #terminal-content textarea, #terminal-content select`);
+                
+                allInputs.forEach(input => {
+                    if (input.id) {
+                        inputs[input.id] = input.value;
+                    }
+                });
+
+                return inputs;
+            },
+
+            // Validate inputs
+            validateInputs(inputs) {
+                // At least one input should have a value
+                return Object.values(inputs).some(value => value && value.trim() !== '');
+            },
+
+            // Generate mock response
+            generateMockResponse(terminalId, inputs) {
+                const responses = {
+                    foundation: `
+                        <h4 class="retro-header text-lg mb-3">✅ POSITIONING STRATEGY GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">Hero Statement:</strong>
+                                <p>"I help [${inputs['foundation-input']?.substring(0, 50) || 'your target audience'}] achieve [specific transformation] through [unique method]."</p>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Key Differentiators:</strong>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Specialization in high-efficiency protocols</li>
+                                    <li>Science-backed, no-BS approach</li>
+                                    <li>Built for busy professionals with limited time</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Recommended Next Steps:</strong>
+                                <ol class="list-decimal list-inside ml-4">
+                                    <li>Create avatar-specific lead magnet</li>
+                                    <li>Develop 3 core content pillars around this positioning</li>
+                                    <li>Build social proof through case studies</li>
+                                </ol>
+                            </div>
+                        </div>
+                    `,
+                    monetization: `
+                        <h4 class="retro-header text-lg mb-3">✅ OFFER LADDER GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">Your Revenue Funnel:</strong>
+                                <div class="mt-2 space-y-2">
+                                    <div class="border-l-4 border-red-600 pl-3">
+                                        <strong>AWARENESS:</strong> ${inputs['monetization-free'] || 'Free Lead Magnet'}
+                                    </div>
+                                    <div class="border-l-4 border-red-400 pl-3">
+                                        <strong>CONSIDERATION:</strong> ${inputs['monetization-tripwire'] || 'Tripwire Offer'}
+                                    </div>
+                                    <div class="border-l-4 border-red-500 pl-3">
+                                        <strong>CONVERSION:</strong> ${inputs['monetization-core'] || 'Core Program'}
+                                    </div>
+                                    <div class="border-l-4 border-red-700 pl-3">
+                                        <strong>ASCENSION:</strong> ${inputs['monetization-premium'] || 'Premium Service'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Projected Revenue Potential:</strong>
+                                <p>With 1,000 leads/month: $5K-15K MRR achievable within 6 months</p>
+                            </div>
+                        </div>
+                    `,
+                    content: `
+                        <h4 class="retro-header text-lg mb-3">✅ CONTENT STRATEGY GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">Primary Platform:</strong> ${inputs['content-platform'] || 'Select a platform'}
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Weekly Content Schedule:</strong>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li><strong>Monday:</strong> Educational post (Pillar 1)</li>
+                                    <li><strong>Wednesday:</strong> Value-packed video (Pillar 2)</li>
+                                    <li><strong>Friday:</strong> Transformation story (Pillar 3)</li>
+                                    <li><strong>Sunday:</strong> Community engagement post</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Content Ratios:</strong>
+                                <p>80% Value | 15% Engagement | 5% Promotional</p>
+                            </div>
+                        </div>
+                    `,
+                    growth: `
+                        <h4 class="retro-header text-lg mb-3">✅ GROWTH PLAN GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">90-Day Roadmap:</strong>
+                                <div class="mt-2 space-y-2">
+                                    <div><strong>Month 1:</strong> Foundation & Consistency (Target: +${Math.round((inputs['growth-goal'] - inputs['growth-current']) * 0.2)} followers)</div>
+                                    <div><strong>Month 2:</strong> Amplification & Engagement (Target: +${Math.round((inputs['growth-goal'] - inputs['growth-current']) * 0.3)} followers)</div>
+                                    <div><strong>Month 3:</strong> Optimization & Scale (Target: +${Math.round((inputs['growth-goal'] - inputs['growth-current']) * 0.5)} followers)</div>
+                                </div>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Key Tactics:</strong>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Daily organic content with strategic hooks</li>
+                                    <li>Collaboration with 3-5 complementary creators</li>
+                                    <li>Email list building via lead magnet</li>
+                                    <li>Paid traffic testing ($10/day minimum)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `,
+                    automation: `
+                        <h4 class="retro-header text-lg mb-3">✅ EMAIL SEQUENCE GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">Sequence Type:</strong> ${inputs['automation-type'] || 'Not specified'}
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Email Flow (${inputs['automation-length'] || '7'} days):</strong>
+                                <ol class="list-decimal list-inside ml-4 space-y-1">
+                                    <li><strong>Day 0:</strong> Welcome + Immediate Value</li>
+                                    <li><strong>Day 2:</strong> Origin Story + Authority Building</li>
+                                    <li><strong>Day 4:</strong> Case Study + Social Proof</li>
+                                    <li><strong>Day 6:</strong> Objection Handling + FAQ</li>
+                                    <li><strong>Day 7:</strong> Soft Pitch + Clear CTA</li>
+                                </ol>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Expected Performance:</strong>
+                                <p>Open Rate: 35-45% | Click Rate: 5-10% | Conversion: 2-5%</p>
+                            </div>
+                        </div>
+                    `,
+                    community: `
+                        <h4 class="retro-header text-lg mb-3">✅ COMMUNITY PLAN GENERATED</h4>
+                        <div class="space-y-3 terminal-text">
+                            <div>
+                                <strong class="text-red-600">Platform:</strong> ${inputs['community-platform'] || 'Not specified'}
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Activation Sequence:</strong>
+                                <ol class="list-decimal list-inside ml-4 space-y-1">
+                                    <li><strong>Week 1:</strong> Welcome ritual + intro thread</li>
+                                    <li><strong>Week 2:</strong> First challenge announcement</li>
+                                    <li><strong>Week 3:</strong> Member spotlight series begins</li>
+                                    <li><strong>Week 4:</strong> Expert Q&A session</li>
+                                </ol>
+                            </div>
+                            <div>
+                                <strong class="text-red-600">Engagement Drivers:</strong>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Daily prompts and check-ins</li>
+                                    <li>Weekly accountability threads</li>
+                                    <li>Monthly transformation contests</li>
+                                    <li>Exclusive bonus content drops</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `
+                };
+
+                return responses[terminalId] || '<p>Strategy generated successfully!</p>';
+            },
+
+            // Close terminal
+            closeTerminal() {
+                const terminalContent = document.getElementById('terminal-content');
+                if (terminalContent) {
+                    terminalContent.innerHTML = '';
+                }
+                this.playBeep(440, 0.05);
+            },
+
+            // Quiz system
+            loadQuiz(quizType) {
+                const quizContainer = document.getElementById('quiz-container');
+                const quizzes = this.getQuizzes();
+                const quiz = quizzes[quizType];
+
+                if (!quiz) return;
+
+                let html = `
+                    <div class="terminal-card">
+                        <h3 class="retro-header text-xl mb-4">${quiz.title}</h3>
+                        <p class="mb-4">${quiz.description}</p>
+                        <div id="quiz-questions" class="space-y-4">
+                `;
+
+                quiz.questions.forEach((q, index) => {
+                    html += `
+                        <div class="quiz-question" data-index="${index}">
+                            <p class="font-bold mb-2">${index + 1}. ${q.question}</p>
+                            <div class="space-y-2">
+                    `;
+                    
+                    q.options.forEach((option, optIndex) => {
+                        html += `
+                            <div class="quiz-option" data-question="${index}" data-answer="${optIndex}" tabindex="0">
+                                ${option}
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                        <div id="quiz-result" class="result-box mt-4" style="display: none;"></div>
+                        <button class="ai-button mt-4" onclick="LegionOS.submitQuiz('${quizType}')">
+                            ✅ SUBMIT ANSWERS
+                        </button>
+                    </div>
+                `;
+
+                quizContainer.innerHTML = html;
+
+                // Add click handlers to options
+                document.querySelectorAll('.quiz-option').forEach(option => {
+                    option.addEventListener('click', function() {
+                        const question = this.dataset.question;
+                        document.querySelectorAll(`[data-question="${question}"]`).forEach(opt => {
+                            opt.classList.remove('bg-gray-200');
+                        });
+                        this.classList.add('bg-gray-200');
+                    });
+
+                    option.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            this.click();
+                        }
+                    });
+                });
+
+                this.playBeep(770, 0.08);
+            },
+
+            // Get quizzes
+            getQuizzes() {
+                return {
+                    positioning: {
+                        title: "📍 MISSION 1: Positioning Fundamentals",
+                        description: "Test your understanding of market positioning and differentiation.",
+                        questions: [
+                            {
+                                question: "What is the PRIMARY benefit of niche positioning?",
+                                options: [
+                                    "A) You can charge higher prices",
+                                    "B) You become the obvious choice for a specific audience",
+                                    "C) You need less content",
+                                    "D) You can work less"
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: "Which positioning strategy is MOST effective for new coaches?",
+                                options: [
+                                    "A) Be everything to everyone",
+                                    "B) Copy successful competitors",
+                                    "C) Focus on a specific transformation for a specific person",
+                                    "D) Target the mass market immediately"
+                                ],
+                                correct: 2
+                            },
+                            {
+                                question: "What makes a positioning statement compelling?",
+                                options: [
+                                    "A) It's vague enough to appeal to everyone",
+                                    "B) It clearly states WHO you help and WHAT transformation you provide",
+                                    "C) It focuses only on credentials",
+                                    "D) It's as long and detailed as possible"
+                                ],
+                                correct: 1
+                            }
+                        ]
+                    },
+                    monetization: {
+                        title: "💰 MISSION 2: Monetization Strategy",
+                        description: "Master the fundamentals of offer creation and pricing.",
+                        questions: [
+                            {
+                                question: "What is the purpose of a 'tripwire' offer?",
+                                options: [
+                                    "A) To maximize profit margins",
+                                    "B) To convert leads into paying customers at low risk",
+                                    "C) To replace your core offer",
+                                    "D) To collect email addresses"
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: "What should your lead magnet accomplish?",
+                                options: [
+                                    "A) Solve the complete problem",
+                                    "B) Provide quick win + create desire for next step",
+                                    "C) Be as comprehensive as possible",
+                                    "D) Generate immediate revenue"
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: "Why is an offer ladder important?",
+                                options: [
+                                    "A) It looks professional",
+                                    "B) It allows customers to ascend to higher value offerings",
+                                    "C) It's required by law",
+                                    "D) It makes marketing easier"
+                                ],
+                                correct: 1
+                            }
+                        ]
+                    },
+                    content: {
+                        title: "📡 MISSION 3: Content Distribution",
+                        description: "Learn the principles of effective content strategy.",
+                        questions: [
+                            {
+                                question: "What is the ideal content ratio?",
+                                options: [
+                                    "A) 50% value, 50% promotional",
+                                    "B) 100% value, 0% promotional",
+                                    "C) 80% value, 15% engagement, 5% promotional",
+                                    "D) 70% promotional, 30% value"
+                                ],
+                                correct: 2
+                            },
+                            {
+                                question: "What makes content 'valuable'?",
+                                options: [
+                                    "A) It's entertaining",
+                                    "B) It solves a specific problem or provides actionable insight",
+                                    "C) It's long and detailed",
+                                    "D) It goes viral"
+                                ],
+                                correct: 1
+                            },
+                            {
+                                question: "How often should you post promotional content?",
+                                options: [
+                                    "A) Every day",
+                                    "B) Never",
+                                    "C) Strategically, after providing substantial value",
+                                    "D) Only during launches"
+                                ],
+                                correct: 2
+                            }
+                        ]
+                    },
+                    growth: {
+                        title: "📈 MISSION 4: Growth Mechanics",
+                        description: "Understand sustainable audience growth strategies.",
+                        questions: [
+                            {
+                                question: "What is the MOST important growth metric?",
+                                options: [
+                                    "A) Follower count",
+                                    "B) Engagement rate",
+                                    "C) Email list size",
+                                    "D) All are equally important for different reasons"
+                                ],
+                                correct: 3
+                            },
+                            {
+                                question: "What drives organic social media growth?",
+                                options: [
+                                    "A) Posting frequency alone",
+                                    "B) Buying followers",
+                                    "C) Consistent value + strategic hooks + engagement",
+                                    "D) Luck and timing"
+                                ],
+                                correct: 2
+                            },
+                            {
+                                question: "When should you start building an email list?",
+                                options: [
+                                    "A) After you have 10K followers",
+                                    "B) From day one",
+                                    "C) After your first sale",
+                                    "D) Once you have a website"
+                                ],
+                                correct: 1
+                            }
+                        ]
+                    }
+                };
+            },
+
+            // Submit quiz
+            submitQuiz(quizType) {
+                const quizzes = this.getQuizzes();
+                const quiz = quizzes[quizType];
+                const resultDiv = document.getElementById('quiz-result');
+
+                let correctCount = 0;
+                let totalQuestions = quiz.questions.length;
+
+                quiz.questions.forEach((q, index) => {
+                    const selectedOption = document.querySelector(`.quiz-option[data-question="${index}"].bg-gray-200`);
+                    const correctOption = document.querySelectorAll(`[data-question="${index}"]`)[q.correct];
+
+                    if (selectedOption) {
+                        const selectedAnswer = parseInt(selectedOption.dataset.answer);
+                        if (selectedAnswer === q.correct) {
+                            selectedOption.classList.add('correct');
+                            correctCount++;
+                        } else {
+                            selectedOption.classList.add('incorrect');
+                        }
+                    }
+
+                    // Highlight correct answer
+                    correctOption.classList.add('correct');
+                });
+
+                const percentage = Math.round((correctCount / totalQuestions) * 100);
+                const passed = percentage >= 70;
+
+                resultDiv.style.display = 'block';
+                resultDiv.className = passed ? 'result-box success' : 'result-box error';
+                resultDiv.innerHTML = `
+                    <h4 class="retro-header text-lg mb-2">
+                        ${passed ? '✅ MISSION COMPLETE' : '❌ MISSION FAILED'}
+                    </h4>
+                    <p class="mb-2">Score: ${correctCount}/${totalQuestions} (${percentage}%)</p>
+                    <p>${passed ? 
+                        'Excellent work, Commander! Knowledge acquired.' : 
+                        'Review the material and try again. Minimum 70% required to pass.'
+                    }</p>
+                `;
+
+                if (passed && !this.state.trainingProgress[quizType]) {
+                    this.state.trainingProgress[quizType] = true;
+                    this.updateTrainingProgress();
+                    this.saveUserData();
+                }
+
+                this.playBeep(passed ? 1100 : 200, 0.15);
+            },
+
+            // Update training progress
+            updateTrainingProgress() {
+                const completedMissions = Object.values(this.state.trainingProgress).filter(Boolean).length;
+                const totalMissions = Object.keys(this.state.trainingProgress).length;
+                const percentage = Math.round((completedMissions / totalMissions) * 100);
+
+                const knowledgeProgress = document.getElementById('knowledge-progress');
+                const knowledgePercentage = document.getElementById('knowledge-percentage');
+                const missionsProgress = document.getElementById('missions-progress');
+                const missionsCompleted = document.getElementById('missions-completed');
+
+                if (knowledgeProgress) knowledgeProgress.style.width = `${percentage}%`;
+                if (knowledgePercentage) knowledgePercentage.textContent = `${percentage}%`;
+                if (missionsProgress) missionsProgress.style.width = `${percentage}%`;
+                if (missionsCompleted) missionsCompleted.textContent = `${completedMissions}/${totalMissions}`;
+            },
+
+            // Update stats display
+            updateStats() {
+                this.state.sessionCount++;
+                
+                const sessionCountEl = document.getElementById('session-count');
+                const queryCountEl = document.getElementById('query-count');
+                
+                if (sessionCountEl) sessionCountEl.textContent = this.state.sessionCount;
+                if (queryCountEl) queryCountEl.textContent = this.state.queryCount;
+            },
+
+            // Uptime counter
+            initUptime() {
+                const uptimeEl = document.getElementById('uptime');
+                if (!uptimeEl) return;
+
+                setInterval(() => {
+                    const elapsed = Date.now() - this.state.sessionStart;
+                    const hours = Math.floor(elapsed / 3600000);
+                    const minutes = Math.floor((elapsed % 3600000) / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    
+                    uptimeEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }, 1000);
+            },
+
+            // Add recent activity
+            addRecentActivity(message) {
+                const activityEl = document.getElementById('recent-activity');
+                if (!activityEl) return;
+
+                const timestamp = new Date().toLocaleTimeString();
+                const activity = document.createElement('p');
+                activity.className = 'text-sm terminal-text';
+                activity.innerHTML = `<span class="text-gray-600">[${timestamp}]</span> ${message}`;
+                
+                if (activityEl.children.length === 0) {
+                    activityEl.innerHTML = '';
+                }
+                
+                activityEl.insertBefore(activity, activityEl.firstChild);
+                
+                // Keep only last 5 activities
+                while (activityEl.children.length > 5) {
+                    activityEl.removeChild(activityEl.lastChild);
+                }
+            },
+
+            // Local storage
+            saveUserData() {
+                try {
+                    localStorage.setItem('legion-os-data', JSON.stringify({
+                        queryCount: this.state.queryCount,
+                        trainingProgress: this.state.trainingProgress,
+                        userData: this.state.userData
+                    }));
+                } catch (error) {
+                    console.warn('Could not save to localStorage:', error);
+                }
+            },
+
+            loadUserData() {
+                try {
+                    const saved = localStorage.getItem('legion-os-data');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        this.state.queryCount = data.queryCount || 0;
+                        this.state.trainingProgress = data.trainingProgress || this.state.trainingProgress;
+                        this.state.userData = data.userData || {};
+                        this.updateTrainingProgress();
+                    }
+                } catch (error) {
+                    console.warn('Could not load from localStorage:', error);
+                }
+            }
+        };
+
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            LegionOS.init();
+        });
+
+        // Global cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            LegionOS.saveUserData();
+        });
+    </script>
+</body>
+</html>
