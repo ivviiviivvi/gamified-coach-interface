@@ -106,13 +106,21 @@ app.use('/api/', limiter);
 const API_VERSION = process.env.API_VERSION || 'v1';
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+  let dbStatus = 'disconnected';
+  try {
+    await sequelize.authenticate();
+    dbStatus = 'connected';
+  } catch (error) {
+    // dbStatus remains disconnected
+  }
+
   res.json({
     status: 'online',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
-    database: sequelize.authenticate().then(() => 'connected').catch(() => 'disconnected')
+    database: dbStatus
   });
 });
 
@@ -268,7 +276,9 @@ process.on('SIGINT', async () => {
   });
 });
 
-// Start the server
-startServer();
+// Start the server if not imported for testing
+if (require.main === module) {
+  startServer();
+}
 
-module.exports = { app, io };
+module.exports = { app, io, server };
