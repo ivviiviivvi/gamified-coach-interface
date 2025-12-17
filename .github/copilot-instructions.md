@@ -18,6 +18,8 @@ This section defines the standard headers to be used in all files.
 ## PROJECT DOCUMENTATION & CONTEXT SYSTEM
 
 This section describes how documentation is structured and accessed.
+- Repository structure and cleanup plans are documented in `docs/REPO_STRUCTURE.md`.
+- Steps to achieve a working prototype are tracked in `docs/WORKING_PROTOTYPE_CHECKLIST.md`.
 
 ## CODING STANDARDS
 
@@ -32,4 +34,13 @@ Follow PEP 8 guidelines.
 
 ## WORKFLOW & RELEASE RULES
 
+- Before starting any task, review the current repository structure and key documentation.
+- When starting a new task, begin by gathering context by reading the README.
+- Perform moves in small PRs to keep diffs reviewable.
+- Update import paths and Vite root when relocating the frontend app.
+- After moving docs, update README links to the new locations.
+- Keep `prototypes/` read-only until feature parity is confirmed in `apps/frontend`.
+
 ## BEST PRACTICES
+
+- Create a `.env` file in the root directory with placeholders for environment variables like `VITE_GEMINI_API_KEY`, and `VITE_BACKEND_URL`.

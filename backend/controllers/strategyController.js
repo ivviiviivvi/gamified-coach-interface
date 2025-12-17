@@ -3,6 +3,8 @@ const { sequelize } = require('../config/database');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 const { trackEvent } = require('../services/analyticsService');
+const { normalizeWorkspace, workspaceToMarkdown, streamWorkspacePdf } = require('../utils/exportFormatter');
+const { validateStrategyResponse } = require('../utils/strategyValidation');
 const Redis = require('redis');
 
 // Initialize Redis for caching (optional)
@@ -307,6 +309,60 @@ Adapt the tone to resonate with gamers and nerds (references to gaming, anime, t
   return `${basePrompts[terminalType]}${contextSummary}\n\nUSER INPUT:\n${JSON.stringify(userInput)}`;
 }
 
+function buildOfflineAnalysis(targetAvatar = '', transformationGoals = '', uniqueMethod = '') {
+  return `STRATEGIC ANALYSIS // FALLBACK MODE
+
+TARGET AVATAR PROFILE:
+${targetAvatar || 'Not provided'}
+
+TRANSFORMATION MISSION:
+${transformationGoals || 'Not provided'}
+
+TACTICAL ADVANTAGE:
+${uniqueMethod || 'Not provided'}
+
+===[ STRATEGIC RECOMMENDATIONS ]===
+
+PHASE 1: FOUNDATION (Days 1-30)
+├─ Establish core brand identity around gamified fitness
+├─ Create free lead magnet (PDF guide or assessment tool)
+├─ Set up basic communication channel (email + community)
+└─ Define 3-tier offering structure
+
+PHASE 2: INITIAL DEPLOYMENT (Days 31-60)
+├─ Launch beta cohort with founding members
+├─ Implement gamification mechanics (XP, levels, quests)
+├─ Develop signature transformation protocol
+└─ Gather testimonials and case studies
+
+PHASE 3: SCALE OPERATIONS (Days 61-90)
+├─ Refine offering based on beta feedback
+├─ Implement automated onboarding sequences
+├─ Build community engagement systems
+└─ Establish consistent content rhythm
+
+MONETIZATION FRAMEWORK:
+├─ FREE: Lead magnet + assessment
+├─ TIER 1: Self-guided program ($47-97)
+├─ TIER 2: Group coaching ($197-497/mo)
+└─ TIER 3: 1-on-1 elite coaching ($997+/mo)
+
+CLIENT ACQUISITION TACTICS:
+- Content marketing targeting pain points
+- Gamification hooks in marketing (level up, boss battles)
+- Community-driven referral mechanics
+- Strategic partnerships with complementary services
+
+NEXT IMMEDIATE ACTIONS:
+1. Create detailed avatar interview questions
+2. Design your free offering (week 1)
+3. Map out your signature transformation journey
+4. Set up basic tech stack (email, payment, community)
+5. Recruit 5 beta testers for validation
+
+===[ END STRATEGIC ANALYSIS ]===`;
+}
+
 /**
  * @desc    Generate AI strategy response
  * @route   POST /api/v1/strategy/generate
@@ -371,6 +427,16 @@ exports.generateStrategy = async (req, res, next) => {
     }
 
     const responseTime = Date.now() - startTime;
+
+    // Validate AI response for actionability before persisting
+    const validation = validateStrategyResponse(terminalType, aiResponse);
+    if (!validation.isValid) {
+      logger.warn('AI response validation failed', {
+        terminalType,
+        issues: validation.issues
+      });
+      throw new AppError(`AI response incomplete: ${validation.issues.join('; ')}`, 502, 'AI_RESPONSE_INVALID');
+    }
 
     // Save session
     await sequelize.query(`
@@ -533,6 +599,130 @@ exports.getHistory = async (req, res, next) => {
       count: sessions.length,
       data: { sessions }
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Export a workspace in JSON, Markdown, or PDF format
+ * @route   GET /api/v1/strategy/workspaces/:id/export
+ * @access  Private
+ */
+exports.exportWorkspace = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const format = (req.query.format || 'json').toLowerCase();
+
+    const [rows] = await sequelize.query(`
+      SELECT *
+      FROM strategy_workspaces
+      WHERE id = :id AND user_id = :userId AND is_active = TRUE
+      LIMIT 1
+    `, {
+      replacements: { id, userId }
+    });
+
+    if (!rows || rows.length === 0) {
+      throw new AppError('Workspace not found', 404, 'WORKSPACE_NOT_FOUND');
+    }
+
+    const workspace = normalizeWorkspace(rows[0]);
+    const exportPayload = {
+      ...workspace,
+      exported_at: new Date().toISOString()
+    };
+
+    if (format === 'markdown' || format === 'md') {
+      res.setHeader('Content-Type', 'text/markdown');
+      res.setHeader('Content-Disposition', `attachment; filename=workspace-${workspace.id}.md`);
+      return res.send(workspaceToMarkdown(exportPayload));
+    }
+
+    if (format === 'pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=workspace-${workspace.id}.pdf`);
+      streamWorkspacePdf(exportPayload, res);
+      return;
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename=workspace-${workspace.id}.json`);
+    return res.json({
+      success: true,
+      data: { workspace: exportPayload }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Render minimal HTML form for offline analysis (no JS required)
+ * @route   GET /api/v1/strategy/offline
+ * @access  Public (optional auth)
+ */
+exports.offlineForm = (req, res) => {
+  res.type('html').send(`<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>LEGION // Offline Strategy Forge</title>
+    <style>
+      body { font-family: Arial, sans-serif; background: #0b0f12; color: #e2f1f5; padding: 24px; }
+      h1 { color: #4fe3ff; letter-spacing: 0.08em; }
+      label { display: block; margin-top: 12px; font-weight: bold; }
+      textarea { width: 100%; min-height: 120px; margin-top: 6px; padding: 10px; background: #111922; color: #e2f1f5; border: 1px solid #284b63; }
+      button { margin-top: 16px; background: #4fe3ff; color: #0b0f12; border: none; padding: 12px 18px; font-weight: bold; cursor: pointer; }
+      .hint { font-size: 0.9rem; color: #a5b8c4; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>LEGION // Offline Strategy Forge</h1>
+    <p class="hint">JavaScript-free mode. Submit this form to receive a plain-text strategy brief.</p>
+    <form method="post" action="/api/${process.env.API_VERSION || 'v1'}/strategy/offline">
+      <label for="targetAvatar">Target Avatar</label>
+      <textarea id="targetAvatar" name="targetAvatar" required placeholder="Describe your ideal client..."></textarea>
+
+      <label for="transformationGoals">Transformation Objectives</label>
+      <textarea id="transformationGoals" name="transformationGoals" required placeholder="What transformation will you guide them through?"></textarea>
+
+      <label for="uniqueMethod">Unique Methodology</label>
+      <textarea id="uniqueMethod" name="uniqueMethod" placeholder="What makes your approach different?"></textarea>
+
+      <button type="submit">Generate Offline Brief</button>
+    </form>
+  </body>
+  </html>`);
+};
+
+/**
+ * @desc    Generate a server-side fallback analysis without JS or Gemini
+ * @route   POST /api/v1/strategy/offline
+ * @access  Public (optional auth)
+ */
+exports.offlineAnalysis = async (req, res, next) => {
+  try {
+    const targetAvatar = req.body.targetAvatar || '';
+    const transformationGoals = req.body.transformationGoals || '';
+    const uniqueMethod = req.body.uniqueMethod || '';
+
+    const analysis = buildOfflineAnalysis(targetAvatar, transformationGoals, uniqueMethod);
+    const payload = {
+      mode: 'offline_fallback',
+      targetAvatar,
+      transformationGoals,
+      uniqueMethod,
+      analysis,
+      generated_at: new Date().toISOString()
+    };
+
+    const acceptHeader = req.headers.accept || '';
+    if (acceptHeader.includes('application/json')) {
+      return res.json({ success: true, data: payload });
+    }
+
+    res.type('text/plain').send(analysis);
   } catch (error) {
     next(error);
   }

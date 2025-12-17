@@ -108,6 +108,11 @@ gamified-coach-interface/
 
 ```
 
+### Organization & cleanup
+- A living blueprint for the repo layout and proposed moves lives in `docs/REPO_STRUCTURE.md`.
+- The step-by-step path to a working prototype is tracked in `docs/WORKING_PROTOTYPE_CHECKLIST.md`.
+- Frontend environment variables now live in `.env` (Gemini key + backend URL). Copy and fill it before running `npm run dev`.
+
 ## 🛠️ Build for Production
 
 To create a production build:
