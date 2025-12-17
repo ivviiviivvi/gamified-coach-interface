@@ -11,6 +11,7 @@ export class OrbitalNodes {
         this.orbitRadius = 2.5;
         this.orbitSpeed = 0.3;
         this.activeNode = null;
+        this.lastHoveredNodeId = null;
 
         this.createNodes();
     }
@@ -119,22 +120,28 @@ export class OrbitalNodes {
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(this.nodes);
 
-        // Reset all nodes
-        this.nodes.forEach(node => {
-            if (this.activeNode !== node.userData.id) {
-                node.material.opacity = 0.9;
-            }
-        });
+        const hoveredNode = intersects.length > 0 ? intersects[0].object : null;
+        const hoveredId = hoveredNode ? hoveredNode.userData.id : null;
 
-        // Highlight hovered node
-        if (intersects.length > 0) {
-            const hoveredNode = intersects[0].object;
-            if (this.activeNode !== hoveredNode.userData.id) {
+        // Optimization: Only update materials if the hovered node has changed
+        if (this.lastHoveredNodeId !== hoveredId) {
+            // Reset previously hovered node if it exists and isn't active
+            if (this.lastHoveredNodeId) {
+                const lastNode = this.nodes.find(n => n.userData.id === this.lastHoveredNodeId);
+                if (lastNode && this.activeNode !== lastNode.userData.id) {
+                    lastNode.material.opacity = 0.9;
+                }
+            }
+
+            // Highlight new hovered node if it exists and isn't active
+            if (hoveredNode && this.activeNode !== hoveredNode.userData.id) {
                 hoveredNode.material.opacity = 1.0;
             }
-            return hoveredNode.userData.id;
+
+            this.lastHoveredNodeId = hoveredId;
         }
-        return null;
+
+        return hoveredId;
     }
 
     activateNode(nodeId) {

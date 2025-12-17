@@ -136,20 +136,6 @@ export class SceneManager {
         // Calculate mouse position in normalized device coordinates
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        // Check for node hover
-        const hoveredNodeId = this.orbitalNodes.handleHover(
-            this.raycaster,
-            this.camera,
-            this.mouse
-        );
-
-        // Update cursor
-        if (hoveredNodeId) {
-            document.body.style.cursor = 'pointer';
-        } else {
-            document.body.style.cursor = 'default';
-        }
     }
 
     onClick(event) {
@@ -176,6 +162,20 @@ export class SceneManager {
         const deltaTime = 0.016; // ~60fps
         this.strategyCore.update(deltaTime);
         this.orbitalNodes.update();
+
+        // Handle hover state in animation loop for consistent performance
+        const hoveredNodeId = this.orbitalNodes.handleHover(
+            this.raycaster,
+            this.camera,
+            this.mouse
+        );
+
+        // Update cursor based on hover state
+        if (hoveredNodeId) {
+            document.body.style.cursor = 'pointer';
+        } else {
+            document.body.style.cursor = 'default';
+        }
 
         // Render
         this.renderer.render(this.scene, this.camera);
