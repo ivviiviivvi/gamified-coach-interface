@@ -50,8 +50,10 @@ export class OrbitalNodes {
             }
         ];
 
+        // ⚡ Bolt Optimization: Reuse geometry to reduce GPU memory allocation
+        const sharedGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+
         nodeConfigs.forEach(config => {
-            const geometry = new THREE.SphereGeometry(0.15, 16, 16);
             const material = new THREE.MeshBasicMaterial({
                 color: config.color,
                 emissive: config.color,
@@ -60,7 +62,7 @@ export class OrbitalNodes {
                 opacity: 0.9
             });
 
-            const node = new THREE.Mesh(geometry, material);
+            const node = new THREE.Mesh(sharedGeometry, material);
             node.userData = {
                 id: config.id,
                 label: config.label,
