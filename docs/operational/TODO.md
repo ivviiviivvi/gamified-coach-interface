@@ -14,19 +14,21 @@
 - [ ] 2.1 Create apps/ directory structure
   - [ ] apps/frontend/
   - [ ] apps/backend/ (symlink to backend/ initially)
-- [ ] 2.2 Move documentation to docs/
-  - [ ] legion-cc-v3-design-spec.md → docs/design-specs/
-  - [ ] legionCommandCenter-*.md → docs/research/
-  - [ ] CLAUDE.md, NORTH_STAR.md, OPTIMIZATIONS.md → docs/
-  - [ ] FRONTEND_INTEGRATION.md, LOGIC_*.md → docs/
-  - [ ] ORGANIZATION.md, MERGE_SUMMARY.md → docs/
+- [x] 2.2 Move documentation to docs/
+  - [x] legion-cc-v3-design-spec.md → docs/design-specs/
+  - [x] legionCommandCenter-*.md → docs/research/
+  - [x] CLAUDE.md, NORTH_STAR.md, OPTIMIZATIONS.md → docs/
+  - [x] FRONTEND_INTEGRATION.md, LOGIC_*.md → docs/architecture/
+  - [x] ORGANIZATION.md, MERGE_SUMMARY.md → docs/operational/
+  - [x] Added docs/INDEX.md for documentation navigation
+  - [x] Added ARCHITECTURE.md at root
 - [ ] 2.3 Create tools/ directory
-  - [ ] Move analyze_docs.py → tools/
+  - [x] Remove duplicate analyze_docs.py from root (kept in scripts/)
   - [ ] Move requirements.txt → tools/
   - [ ] Add tools/README.md with usage
-- [ ] 2.4 Mark prototypes as deprecated
-  - [ ] Add DEPRECATED.md to prototypes/
-  - [ ] Update README to point to legion-v3.html
+- [x] 2.4 Mark prototypes as deprecated
+  - [x] Add README.md to prototypes/ with deprecation notice
+  - [x] Update README to reference new documentation structure
 - [ ] 2.5 Consolidate root HTML files
   - [ ] Decide on index.html vs legion-v3.html entry point
   - [ ] Move legacy HTML to prototypes/

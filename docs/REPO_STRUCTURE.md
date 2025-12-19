@@ -33,11 +33,13 @@ gamified-coach-interface/
 ```
 
 ## Suggested moves (safe batches)
-1) **Docs consolidation**: Move `legion-cc-v3-design-spec.md`, `legionCommandCenter-applicationDrafts_‎Gemini.md`, `legionCommandCenter-fitnessNicheResearch_‎Gemini.md`, `CLAUDE.md`, `NORTH_STAR.md`, `OPTIMIZATIONS.md`, `ORGANIZATION.md`, `FRONTEND_INTEGRATION.md`, `LOGIC_*` into `docs/` (keep subfolders by theme: design-specs/, research/, ops/).
+1) ✅ **Docs consolidation**: Completed! Moved `legion-cc-v3-design-spec.md`, `legionCommandCenter-applicationDrafts_‎Gemini.md`, `legionCommandCenter-fitnessNicheResearch_‎Gemini.md`, `CLAUDE.md`, `NORTH_STAR.md`, `OPTIMIZATIONS.md`, `ORGANIZATION.md`, `FRONTEND_INTEGRATION.md`, `LOGIC_*` into `docs/` with proper subfolders (architecture/, operational/, design-specs/, research/). Added comprehensive `ARCHITECTURE.md` at root and `docs/INDEX.md` for navigation.
 2) **Frontend app folder**: Create `apps/frontend` and move `src/`, `index.html`, `legion-v3.html`, `client.html`, `vite.config.js`, `vitest.config.js`, `package.json`, `pnpm-lock.yaml` (or `package-lock.json`) there; adjust package scripts to use the new root and Vite root.
 3) **Backend alignment**: Keep `apps/backend` mapped to current `backend/`; expose a single `.env.example` at repo root that points to `apps/backend/.env` for production.
-4) **Tools**: Move `analyze_docs.py` + `requirements.txt` into `tools/` with a short README; add a `Makefile` or `npm` script alias to run it.
-5) **Prototypes**: Tag files in `prototypes/` as deprecated and link to their replacements (or delete after confirming).
+4) ✅ **Tools**: Removed duplicate `analyze_docs.py` from root (kept only in `scripts/`); requirements.txt remains at root for now.
+5) ✅ **Prototypes**: Added `prototypes/README.md` documenting deprecated files and linking to their replacements.
+6) ✅ **Governance**: Added LICENSE (MIT), CONTRIBUTING.md, CODE_OF_CONDUCT.md, and SECURITY.md files.
+7) ✅ **GitHub Templates**: Added issue templates (bug_report.md, feature_request.md) and pull request template.
 
 ## Delivery checkpoints toward a working prototype
 - ✅ Frontend: `npm install && npm run dev` serves `legion-v3.html` at port 3000 with Gemini key picked up from `.env`.
@@ -46,7 +48,11 @@ gamified-coach-interface/
 - 🔜 CI: add lint + test steps (Vitest, Jest) to GitHub Actions and enforce formatting (.prettierrc already present).
 
 ## Migration notes
-- Perform moves in small PRs to keep diffs reviewable.
-- Update import paths and Vite root when relocating the frontend app.
-- After moving docs, update README links to the new locations.
-- Keep `prototypes/` read-only until feature parity is confirmed in `apps/frontend`.
+- ✅ Performed documentation moves in organized commits to keep diffs reviewable.
+- ✅ Updated README links to new documentation locations.
+- ✅ Added comprehensive ARCHITECTURE.md and docs/INDEX.md for navigation.
+- ✅ Added governance files (LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY).
+- ✅ Added GitHub issue and PR templates.
+- 🔜 Update import paths and Vite root when relocating the frontend app.
+- ✅ `prototypes/` marked as deprecated with README explaining status.
+- 🔜 Keep `prototypes/` read-only until feature parity is confirmed in current interfaces.
