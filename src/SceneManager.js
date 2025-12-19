@@ -16,6 +16,7 @@ export class SceneManager {
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
         this.animationId = null;
+        this.frameCount = 0;
 
         this.init();
         this.setupLights();
@@ -163,18 +164,21 @@ export class SceneManager {
         this.strategyCore.update(deltaTime);
         this.orbitalNodes.update();
 
-        // Handle hover state in animation loop for consistent performance
-        const hoveredNodeId = this.orbitalNodes.handleHover(
-            this.raycaster,
-            this.camera,
-            this.mouse
-        );
+        // Throttle hover check to every 3rd frame (20fps effective check) to save CPU
+        // This maintains interactivity with moving objects while reducing raycasting overhead
+        this.frameCount++;
+        if (this.frameCount % 3 === 0) {
+            const hoveredNodeId = this.orbitalNodes.handleHover(
+                this.raycaster,
+                this.camera,
+                this.mouse
+            );
 
-        // Update cursor based on hover state
-        if (hoveredNodeId) {
-            document.body.style.cursor = 'pointer';
-        } else {
-            document.body.style.cursor = 'default';
+            if (hoveredNodeId) {
+                document.body.style.cursor = 'pointer';
+            } else {
+                document.body.style.cursor = 'default';
+            }
         }
 
         // Render
