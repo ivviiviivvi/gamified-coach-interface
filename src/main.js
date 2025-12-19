@@ -65,13 +65,23 @@ class LegionCommandCenter {
         // Node hint buttons
         const nodeHints = document.querySelectorAll('.node-hint');
         nodeHints.forEach(hint => {
-            hint.addEventListener('click', () => {
+            const activateNode = () => {
                 const nodeId = hint.getAttribute('data-node');
                 this.handleNodeActivation(nodeId);
 
                 // Update active state
                 nodeHints.forEach(h => h.classList.remove('active'));
                 hint.classList.add('active');
+            };
+
+            hint.addEventListener('click', activateNode);
+
+            // Add keyboard accessibility
+            hint.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activateNode();
+                }
             });
         });
 
