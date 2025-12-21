@@ -116,7 +116,25 @@ const User = sequelize.define('User', {
         user.password_hash = await bcrypt.hash(user.password_hash, 10);
       }
     }
-  }
+  },
+  indexes: [
+    {
+      unique: true,
+      fields: ['email']
+    },
+    {
+      unique: true,
+      fields: ['username']
+    },
+    // Performance: Optimize search by status for active user queries
+    {
+      fields: ['status']
+    },
+    // Performance: Optimize gamification leaderboards
+    {
+      fields: ['total_xp', 'level']
+    }
+  ]
 });
 
 // Instance methods
