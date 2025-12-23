@@ -232,6 +232,8 @@
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.3s;
+            appearance: none;
+            text-transform: uppercase;
         }
 
         .node-hint:hover {
@@ -574,15 +576,15 @@
         </div>
 
         <div id="nodes-info">
-            <div class="node-hint" data-node="target-analysis" role="button" tabindex="0" aria-label="Open Target Analysis Module">TARGET ANALYSIS</div>
-            <div class="node-hint" data-node="intel-viz" role="button" tabindex="0" aria-label="Open Intel Visualization Module">INTEL VISUALIZATION</div>
-            <div class="node-hint" data-node="field-ops" role="button" tabindex="0" aria-label="Open Field Operations Module">FIELD OPERATIONS</div>
-            <div class="node-hint" data-node="training" role="button" tabindex="0" aria-label="Open Training Protocols Module">TRAINING PROTOCOLS</div>
-            <div class="node-hint" data-node="archive" role="button" tabindex="0" aria-label="Open Data Archive Module">DATA ARCHIVE</div>
+            <button class="node-hint" data-node="target-analysis">TARGET ANALYSIS</button>
+            <button class="node-hint" data-node="intel-viz">INTEL VISUALIZATION</button>
+            <button class="node-hint" data-node="field-ops">FIELD OPERATIONS</button>
+            <button class="node-hint" data-node="training">TRAINING PROTOCOLS</button>
+            <button class="node-hint" data-node="archive">DATA ARCHIVE</button>
         </div>
 
         <!-- Terminal Modal -->
-        <div id="terminal-modal">
+        <div id="terminal-modal" role="dialog" aria-modal="true" aria-labelledby="terminal-title">
             <div class="terminal-header">
                 <h2 class="terminal-title" id="terminal-title">TERMINAL</h2>
                 <button class="terminal-close" id="close-terminal">CLOSE</button>
