@@ -5,6 +5,17 @@ A comprehensive gamified fitness coaching platform featuring:
 - **V2 Retro Interface**: Pixel RPG-style coaching dashboard
 - **Document Analysis System**: Python-based strategic document ingestion and analysis
 
+## 🎬 Portfolio Video Resources
+
+**For Hiring Managers & Decision Makers:** This repository includes comprehensive resources for creating a professional portfolio video that explains the project in business terms without requiring code literacy.
+
+- **⚡ [Quick Start Guide](QUICK_START_VIDEO.md)** - Start here! 5-minute overview and action plan
+- **📹 [Video Production Guide](VIDEO_PRODUCTION_README.md)** - Complete step-by-step production guide
+- **📝 [Full Video Script & Assets](HIRING_PORTFOLIO_VIDEO.md)** - Executive hook, narration script, visual plan, and B-roll prompts
+- **⚙️ [Configuration Template](.video-config.env.example)** - Customizable environment variables for video production
+
+These resources demonstrate how to translate technical work into strategic narratives for executive audiences.
+
 ## 🚀 Quick Start - Legion Command Center V3
 
 ### Requirements
@@ -113,6 +124,7 @@ gamified-coach-interface/
 This project is well-documented with clear structure:
 
 - **📖 [Documentation Index](docs/INDEX.md)** - Complete documentation map
+- **🔍 [Comprehensive Critical Analysis](docs/COMPREHENSIVE_CRITICAL_ANALYSIS.md)** - Exhaustive 9-dimensional project analysis
 - **🏗️ [Architecture Guide](ARCHITECTURE.md)** - Project structure and architecture
 - **🤝 [Contributing Guide](CONTRIBUTING.md)** - How to contribute
 - **🔒 [Security Policy](SECURITY.md)** - Vulnerability reporting

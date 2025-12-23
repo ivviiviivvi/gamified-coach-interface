@@ -105,6 +105,16 @@ const User = sequelize.define('User', {
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [
+    // Index for filtering active users (high frequency query)
+    {
+      fields: ['status']
+    },
+    // Composite index for leaderboard sorting and pagination
+    {
+      fields: ['total_xp', 'level']
+    }
+  ],
   hooks: {
     beforeCreate: async (user) => {
       if (user.password_hash) {
@@ -116,7 +126,25 @@ const User = sequelize.define('User', {
         user.password_hash = await bcrypt.hash(user.password_hash, 10);
       }
     }
-  }
+  },
+  indexes: [
+    {
+      unique: true,
+      fields: ['email']
+    },
+    {
+      unique: true,
+      fields: ['username']
+    },
+    // Performance: Optimize search by status for active user queries
+    {
+      fields: ['status']
+    },
+    // Performance: Optimize gamification leaderboards
+    {
+      fields: ['total_xp', 'level']
+    }
+  ]
 });
 
 // Instance methods

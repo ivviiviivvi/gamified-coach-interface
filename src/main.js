@@ -65,23 +65,13 @@ class LegionCommandCenter {
         // Node hint buttons
         const nodeHints = document.querySelectorAll('.node-hint');
         nodeHints.forEach(hint => {
-            const activateNode = () => {
+            hint.addEventListener('click', () => {
                 const nodeId = hint.getAttribute('data-node');
                 this.handleNodeActivation(nodeId);
 
                 // Update active state
                 nodeHints.forEach(h => h.classList.remove('active'));
                 hint.classList.add('active');
-            };
-
-            hint.addEventListener('click', activateNode);
-
-            // Add keyboard accessibility
-            hint.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    activateNode();
-                }
             });
         });
 
@@ -105,6 +95,9 @@ class LegionCommandCenter {
     }
 
     openTerminal(nodeId) {
+        // Store the last focused element to restore later
+        this.lastFocusedElement = document.activeElement;
+
         const modal = document.getElementById('terminal-modal');
         const title = document.getElementById('terminal-title');
         const content = document.getElementById('terminal-content');
@@ -120,6 +113,12 @@ class LegionCommandCenter {
 
         // Show modal
         modal.classList.add('active');
+
+        // Move focus to the close button for accessibility
+        const closeBtn = document.getElementById('close-terminal');
+        if (closeBtn) {
+            closeBtn.focus();
+        }
 
         // Setup terminal-specific event listeners
         this.setupTerminalListeners(nodeId);
@@ -138,6 +137,12 @@ class LegionCommandCenter {
         // Clear active hint
         const nodeHints = document.querySelectorAll('.node-hint');
         nodeHints.forEach(h => h.classList.remove('active'));
+
+        // Restore focus to the element that opened the terminal
+        if (this.lastFocusedElement) {
+            this.lastFocusedElement.focus();
+            this.lastFocusedElement = null;
+        }
     }
 
     getTerminalConfig(nodeId) {
