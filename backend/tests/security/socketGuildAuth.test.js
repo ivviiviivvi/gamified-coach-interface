@@ -1,4 +1,3 @@
-
 const { sequelize } = require('../../config/database');
 
 // Mock Sequelize and Database
