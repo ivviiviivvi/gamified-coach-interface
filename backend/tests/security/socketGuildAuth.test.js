@@ -85,23 +85,8 @@ describe('Socket Security: Guild Authorization', () => {
 
     await guildMessageHandler(data);
 
-    // Verify it broadcasted
+    // Verify message was broadcasted to the correct guild
     expect(io.to).toHaveBeenCalledWith('guild:100');
-    // Note: io.to returns 'this', then emit is called.
-    // Since we mocked to() to return 'this' (the io instance), we can check if emit was called?
-    // Actually the mock implementation in health.test.js says `emit: jest.fn()`.
-    // Wait, `io.to().emit()` calls `emit` on the object returned by `to()`.
-    // In our mock, `to()` returns `this`, so `io.emit` should be called.
-    // However, `io` is the instance returned by `socketIo()`.
-    // Let's check `io.emit` calls. But wait, `emit` is called on the result of `to()`.
-    // If `to()` returns `io` (which it does via mockReturnThis()), then `io.emit` is called.
-    // But verify the args.
-
-    // Wait, the emit in server.js is:
-    // io.to(...).emit('new_guild_message', ...)
-
-    // The mock for `emit` is on the io instance.
-    // So yes, `io.emit` should be called.
     expect(io.emit).toHaveBeenCalledWith('new_guild_message', expect.objectContaining({
         message: 'Hello Guild 100',
         senderId: 'user-123'
@@ -115,11 +100,9 @@ describe('Socket Security: Guild Authorization', () => {
     io.to.mockClear();
     io.emit.mockClear();
 
-    // This should ideally throw or just not emit.
-    // Currently, it WILL emit because of the vulnerability.
     await guildMessageHandler(data);
 
-    // This expectation should FAIL if the vulnerability exists
+    // Verify message was NOT broadcasted (authorization check prevented it)
     expect(io.to).not.toHaveBeenCalledWith('guild:999');
     expect(io.emit).not.toHaveBeenCalledWith('new_guild_message', expect.anything());
   });
