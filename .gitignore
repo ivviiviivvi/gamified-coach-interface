@@ -50,3 +50,11 @@ yarn-error.log*
 
 # Video production configuration (contains personal information)
 .video-config.env
+.video-production.env
+
+# Video production outputs
+video_output/
+*.mp4
+*.wav
+*.avi
+*.mov
