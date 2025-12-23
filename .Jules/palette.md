@@ -5,3 +5,7 @@
 ## 2024-05-24 - [Keyboard Accessibility for Custom Controls]
 **Learning:** `div` elements used as interactive controls are invisible to keyboard users and screen readers unless explicitly marked with `role="button"`, `tabindex="0"`, and keyboard event handlers.
 **Action:** Always add semantic roles, tabindex, and `keydown` listeners (Enter/Space) when creating custom interactive elements from non-semantic tags.
+
+## 2024-05-25 - [Modal Focus Management]
+**Learning:** Modals triggered by buttons must manage focus explicitly: move focus into the modal on open, and restore it to the trigger on close, or the keyboard navigation flow is broken.
+**Action:** Store `document.activeElement` before opening a modal, focus a close button/first input inside, and restore focus on close.

@@ -105,6 +105,9 @@ class LegionCommandCenter {
     }
 
     openTerminal(nodeId) {
+        // Store the last focused element to restore later
+        this.lastFocusedElement = document.activeElement;
+
         const modal = document.getElementById('terminal-modal');
         const title = document.getElementById('terminal-title');
         const content = document.getElementById('terminal-content');
@@ -120,6 +123,12 @@ class LegionCommandCenter {
 
         // Show modal
         modal.classList.add('active');
+
+        // Move focus to the close button for accessibility
+        const closeBtn = document.getElementById('close-terminal');
+        if (closeBtn) {
+            closeBtn.focus();
+        }
 
         // Setup terminal-specific event listeners
         this.setupTerminalListeners(nodeId);
@@ -138,6 +147,12 @@ class LegionCommandCenter {
         // Clear active hint
         const nodeHints = document.querySelectorAll('.node-hint');
         nodeHints.forEach(h => h.classList.remove('active'));
+
+        // Restore focus to the element that opened the terminal
+        if (this.lastFocusedElement) {
+            this.lastFocusedElement.focus();
+            this.lastFocusedElement = null;
+        }
     }
 
     getTerminalConfig(nodeId) {
@@ -170,7 +185,7 @@ class LegionCommandCenter {
     getStrategyForgeContent() {
         return `
             <div class="hologram-input-container">
-                <label class="hologram-label">TARGET AVATAR PARAMETERS</label>
+                <label class="hologram-label" for="target-avatar">TARGET AVATAR PARAMETERS</label>
                 <textarea
                     class="hologram-textarea"
                     id="target-avatar"
@@ -180,7 +195,7 @@ Example: High-stress tech workers aged 28-40, desk-bound professionals seeking t
             </div>
 
             <div class="hologram-input-container">
-                <label class="hologram-label">TRANSFORMATION OBJECTIVES</label>
+                <label class="hologram-label" for="transformation-goals">TRANSFORMATION OBJECTIVES</label>
                 <textarea
                     class="hologram-textarea"
                     id="transformation-goals"
@@ -190,7 +205,7 @@ Example: From sedentary to strength athlete in 90 days"
             </div>
 
             <div class="hologram-input-container">
-                <label class="hologram-label">UNIQUE METHODOLOGY</label>
+                <label class="hologram-label" for="unique-method">UNIQUE METHODOLOGY</label>
                 <textarea
                     class="hologram-textarea"
                     id="unique-method"
