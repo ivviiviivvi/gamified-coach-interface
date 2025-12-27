@@ -551,11 +551,11 @@
         </div>
     </noscript>
     <!-- Boot Screen -->
-    <div id="boot-screen">
+    <div id="boot-screen" role="alert" aria-busy="true">
         <div class="boot-logo">LEGION OS</div>
         <div class="boot-message">INITIALIZING STRATEGY CORE...</div>
         <div class="boot-message">LOADING TACTICAL MODULES...</div>
-        <div class="boot-progress">
+        <div class="boot-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="System Boot Progress">
             <div class="boot-progress-bar" id="boot-bar"></div>
         </div>
     </div>
@@ -589,7 +589,7 @@
                 <h2 class="terminal-title" id="terminal-title">TERMINAL</h2>
                 <button class="terminal-close" id="close-terminal">CLOSE</button>
             </div>
-            <div id="terminal-content">
+            <div id="terminal-content" aria-live="polite">
                 <!-- Content will be dynamically inserted -->
             </div>
         </div>
