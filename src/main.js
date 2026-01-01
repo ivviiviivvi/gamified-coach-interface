@@ -39,11 +39,13 @@ class LegionCommandCenter {
                 if (progress > 100) progress = 100;
 
                 bootBar.style.width = progress + '%';
+                bootBar.setAttribute('aria-valuenow', Math.round(progress));
 
                 if (progress === 100) {
                     clearInterval(interval);
                     setTimeout(() => {
                         bootScreen.classList.add('hidden');
+                        bootScreen.setAttribute('aria-hidden', 'true');
                         resolve();
                     }, 500);
                 }
@@ -114,10 +116,15 @@ class LegionCommandCenter {
         // Show modal
         modal.classList.add('active');
 
-        // Move focus to the close button for accessibility
-        const closeBtn = document.getElementById('close-terminal');
-        if (closeBtn) {
-            closeBtn.focus();
+        // Focus management: Try to find the first input, otherwise close button
+        const firstInput = content.querySelector('input, textarea, button:not(#close-terminal)');
+        if (firstInput) {
+            firstInput.focus();
+        } else {
+            const closeBtn = document.getElementById('close-terminal');
+            if (closeBtn) {
+                closeBtn.focus();
+            }
         }
 
         // Setup terminal-specific event listeners
