@@ -57,13 +57,11 @@ export class OrbitalNodes {
         nodeConfigs.forEach(config => {
             const material = new THREE.MeshBasicMaterial({
                 color: config.color,
-                emissive: config.color,
-                emissiveIntensity: 0.5,
                 transparent: true,
                 opacity: 0.9
             });
 
-            const node = new THREE.Mesh(sharedGeometry, material);
+            const node = new THREE.Mesh(geometry, material);
             node.userData = {
                 id: config.id,
                 label: config.label,
