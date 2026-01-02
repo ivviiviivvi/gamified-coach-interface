@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
 const socketIo = require('socket.io');
+const sanitizeHtml = require('sanitize-html');
 require('dotenv').config();
 
 const { sequelize } = require('./config/database');
@@ -176,11 +177,26 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data) => {
     try {
       const { recipientId, message } = data;
+
+      if (!message || typeof message !== 'string') {
+        throw new Error('Invalid message format');
+      }
+
+      // Sanitize message to prevent XSS
+      const sanitizedMessage = sanitizeHtml(message, {
+        allowedTags: [], // Strip all tags
+        allowedAttributes: {}
+      });
+
+      if (sanitizedMessage.length > 1000) {
+        throw new Error('Message too long');
+      }
+
       // Save message to database
       // Emit to recipient
       io.to(`user:${recipientId}`).emit('new_message', {
         senderId: socket.user.id,
-        message,
+        message: sanitizedMessage,
         timestamp: new Date()
       });
     } catch (error) {
@@ -193,6 +209,20 @@ io.on('connection', (socket) => {
     try {
       const { guildId, message } = data;
 
+      if (!message || typeof message !== 'string') {
+        throw new Error('Invalid message format');
+      }
+
+      // Sanitize message to prevent XSS
+      const sanitizedMessage = sanitizeHtml(message, {
+        allowedTags: [], // Strip all tags
+        allowedAttributes: {}
+      });
+
+      if (sanitizedMessage.length > 1000) {
+        throw new Error('Message too long');
+      }
+
       // Verify user is member of guild
       if (!socket.user?.guilds || !socket.user.guilds.includes(guildId)) {
         throw new Error('NOT_AUTHORIZED_GUILD');
@@ -203,7 +233,7 @@ io.on('connection', (socket) => {
       io.to(`guild:${guildId}`).emit('new_guild_message', {
         senderId: socket.user.id,
         username: socket.user.username,
-        message,
+        message: sanitizedMessage,
         timestamp: new Date()
       });
     } catch (error) {
