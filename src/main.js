@@ -31,6 +31,7 @@ class LegionCommandCenter {
     async bootSequence() {
         const bootScreen = document.getElementById('boot-screen');
         const bootBar = document.getElementById('boot-bar');
+        const bootContainer = document.getElementById('boot-progress-container');
 
         return new Promise((resolve) => {
             let progress = 0;
@@ -39,11 +40,16 @@ class LegionCommandCenter {
                 if (progress > 100) progress = 100;
 
                 bootBar.style.width = progress + '%';
+                if (bootContainer) {
+                    bootContainer.setAttribute('aria-valuenow', Math.round(progress));
+                }
 
                 if (progress === 100) {
                     clearInterval(interval);
                     setTimeout(() => {
                         bootScreen.classList.add('hidden');
+                        // Ensure screen readers know it's done/hidden
+                        bootScreen.setAttribute('aria-hidden', 'true');
                         resolve();
                     }, 500);
                 }
