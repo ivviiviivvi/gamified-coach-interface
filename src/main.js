@@ -39,6 +39,7 @@ class LegionCommandCenter {
                 if (progress > 100) progress = 100;
 
                 bootBar.style.width = progress + '%';
+                bootBar.parentElement.setAttribute('aria-valuenow', Math.round(progress));
 
                 if (progress === 100) {
                     clearInterval(interval);
