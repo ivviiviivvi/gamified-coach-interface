@@ -31,6 +31,7 @@ class LegionCommandCenter {
     async bootSequence() {
         const bootScreen = document.getElementById('boot-screen');
         const bootBar = document.getElementById('boot-bar');
+        const bootProgress = bootBar.parentElement;
 
         return new Promise((resolve) => {
             let progress = 0;
@@ -38,7 +39,9 @@ class LegionCommandCenter {
                 progress += Math.random() * 15;
                 if (progress > 100) progress = 100;
 
+                const roundedProgress = Math.floor(progress);
                 bootBar.style.width = progress + '%';
+                bootProgress.setAttribute('aria-valuenow', roundedProgress);
 
                 if (progress === 100) {
                     clearInterval(interval);
