@@ -9,3 +9,7 @@
 ## 2024-05-25 - [Modal Focus Management]
 **Learning:** Modals triggered by buttons must manage focus explicitly: move focus into the modal on open, and restore it to the trigger on close, or the keyboard navigation flow is broken.
 **Action:** Store `document.activeElement` before opening a modal, focus a close button/first input inside, and restore focus on close.
+
+## 2024-05-26 - [Boot Screen Accessibility]
+**Learning:** Loading screens that visually disappear (opacity: 0) often remain in the accessibility tree, confusing screen reader users who still navigate them.
+**Action:** Always ensure transient UI elements use `visibility: hidden` or `display: none` when they are meant to be removed from the user's perception, not just visual opacity.
