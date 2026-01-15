@@ -18,6 +18,9 @@ export class SceneManager {
         this.animationId = null;
         this.frameCount = 0;
 
+        // Optimization: Bind animate once to avoid creating closures per frame
+        this.animate = this.animate.bind(this);
+
         this.init();
         this.setupLights();
         this.setupObjects();
@@ -157,7 +160,7 @@ export class SceneManager {
     }
 
     animate() {
-        this.animationId = requestAnimationFrame(() => this.animate());
+        this.animationId = requestAnimationFrame(this.animate);
 
         // Update objects
         const deltaTime = 0.016; // ~60fps

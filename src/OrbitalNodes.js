@@ -63,7 +63,7 @@ export class OrbitalNodes {
                 opacity: 0.9
             });
 
-            const node = new THREE.Mesh(sharedGeometry, material);
+            const node = new THREE.Mesh(geometry, material);
             node.userData = {
                 id: config.id,
                 label: config.label,
@@ -83,7 +83,10 @@ export class OrbitalNodes {
     update() {
         const time = Date.now() * 0.001;
 
-        this.nodes.forEach((node, i) => {
+        // Optimization: Use for loop instead of forEach to avoid creating a callback function every frame
+        // This reduces Garbage Collection (GC) pressure in the animation loop (60fps)
+        for (let i = 0; i < this.nodes.length; i++) {
+            const node = this.nodes[i];
             const angle = (i / this.nodes.length) * Math.PI * 2 + time * this.orbitSpeed;
 
             // Position nodes in orbit around core
@@ -102,7 +105,7 @@ export class OrbitalNodes {
             } else {
                 node.material.emissiveIntensity = 0.5;
             }
-        });
+        }
     }
 
     // Handle click detection with raycaster
