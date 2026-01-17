@@ -10,6 +10,17 @@ def verify_terminal_accessibility():
         print("Navigating to legion-v3.html...")
         page.goto("http://localhost:3000/legion-v3.html")
 
+        # Check Boot Screen Accessibility
+        print("Checking boot progress bar accessibility...")
+        boot_progress = page.locator(".boot-progress")
+        expect(boot_progress).to_have_attribute("role", "progressbar")
+        expect(boot_progress).to_have_attribute("aria-label", "System Boot Progress")
+        # Wait for progress to start updating
+        page.wait_for_timeout(500)
+        # It should eventually reach 100
+        expect(boot_progress).to_have_attribute("aria-valuenow", "100", timeout=10000)
+        print("SUCCESS: Boot progress bar has correct ARIA attributes and updates")
+
         # Wait for initialization (boot screen logic)
         # The boot screen takes some time to disappear
         print("Waiting for boot screen to clear...")
