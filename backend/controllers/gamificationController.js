@@ -129,6 +129,7 @@ exports.checkAchievements = async (req, res, next) => {
     });
 
     const unlockedAchievements = [];
+    let totalXpReward = 0;
 
     for (const achievement of achievements) {
       const requirements = achievement.requirements;
@@ -143,8 +144,16 @@ exports.checkAchievements = async (req, res, next) => {
       }
 
       if (unlocked) {
-        // Unlock achievement
-        await sequelize.query(`
+        unlockedAchievements.push(achievement);
+        totalXpReward += achievement.xp_reward;
+      }
+    }
+
+    if (unlockedAchievements.length > 0) {
+      // 1. Batch Insert User Achievements (Parallel execution)
+      // We use Promise.all to execute inserts in parallel, which is faster than sequential execution
+      await Promise.all(unlockedAchievements.map(achievement =>
+        sequelize.query(`
           INSERT INTO user_achievements (user_id, achievement_id, is_completed, unlocked_at)
           VALUES (:userId, :achievementId, TRUE, NOW())
           ON CONFLICT (user_id, achievement_id) DO UPDATE
@@ -154,37 +163,44 @@ exports.checkAchievements = async (req, res, next) => {
             userId,
             achievementId: achievement.id
           }
-        });
+        })
+      ));
 
-        // Award XP
-        await user.addXP(achievement.xp_reward);
-
-        // Create notification
-        await sequelize.query(`
-          INSERT INTO notifications (user_id, notification_type, title, message, data)
-          VALUES (:userId, 'achievement', :title, :message, :data)
-        `, {
-          replacements: {
-            userId,
-            title: '🏆 ACHIEVEMENT UNLOCKED!',
-            message: `You unlocked: ${achievement.name}`,
-            data: JSON.stringify({ achievementId: achievement.id, xpReward: achievement.xp_reward })
-          }
-        });
-
-        unlockedAchievements.push(achievement);
-
-        // Track event
-        await trackEvent({
-          userId,
-          eventType: 'achievement_unlocked',
-          properties: {
-            achievementId: achievement.id,
-            achievementName: achievement.name,
-            xpReward: achievement.xp_reward
-          }
-        });
+      // 2. Award XP (Once)
+      // Optimization: Aggregate XP reward and call database update once instead of N times
+      if (totalXpReward > 0) {
+        await user.addXP(totalXpReward);
       }
+
+      // 3. Batch Notifications and Events (Parallel execution)
+      await Promise.all([
+        // Notifications
+        ...unlockedAchievements.map(achievement =>
+          sequelize.query(`
+            INSERT INTO notifications (user_id, notification_type, title, message, data)
+            VALUES (:userId, 'achievement', :title, :message, :data)
+          `, {
+            replacements: {
+              userId,
+              title: '🏆 ACHIEVEMENT UNLOCKED!',
+              message: `You unlocked: ${achievement.name}`,
+              data: JSON.stringify({ achievementId: achievement.id, xpReward: achievement.xp_reward })
+            }
+          })
+        ),
+        // Tracking
+        ...unlockedAchievements.map(achievement =>
+          trackEvent({
+            userId,
+            eventType: 'achievement_unlocked',
+            properties: {
+              achievementId: achievement.id,
+              achievementName: achievement.name,
+              xpReward: achievement.xp_reward
+            }
+          })
+        )
+      ]);
     }
 
     res.json({
