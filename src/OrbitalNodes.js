@@ -55,15 +55,14 @@ export class OrbitalNodes {
         const geometry = new THREE.SphereGeometry(0.15, 16, 16);
 
         nodeConfigs.forEach(config => {
+            // Note: MeshBasicMaterial does not support emissive properties
             const material = new THREE.MeshBasicMaterial({
                 color: config.color,
-                emissive: config.color,
-                emissiveIntensity: 0.5,
                 transparent: true,
                 opacity: 0.9
             });
 
-            const node = new THREE.Mesh(sharedGeometry, material);
+            const node = new THREE.Mesh(geometry, material);
             node.userData = {
                 id: config.id,
                 label: config.label,
@@ -97,10 +96,7 @@ export class OrbitalNodes {
 
             // Highlight active node
             if (this.activeNode === node.userData.id) {
-                node.material.emissiveIntensity = 1.0;
                 node.scale.setScalar(1.3);
-            } else {
-                node.material.emissiveIntensity = 0.5;
             }
         });
     }
@@ -159,9 +155,10 @@ export class OrbitalNodes {
         const node = this.nodes.find(n => n.userData.id === nodeId);
         if (node) {
             // Flash effect
-            node.material.emissiveIntensity = 2.0;
+            const originalScale = node.scale.x;
+            node.scale.setScalar(originalScale * 1.5);
             setTimeout(() => {
-                node.material.emissiveIntensity = 1.0;
+                node.scale.setScalar(originalScale);
             }, 200);
         }
     }

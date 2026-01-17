@@ -9,3 +9,7 @@
 ## 2024-05-25 - [Modal Focus Management]
 **Learning:** Modals triggered by buttons must manage focus explicitly: move focus into the modal on open, and restore it to the trigger on close, or the keyboard navigation flow is broken.
 **Action:** Store `document.activeElement` before opening a modal, focus a close button/first input inside, and restore focus on close.
+
+## 2025-01-20 - [Testing Accessibility with Playwright]
+**Learning:** Verifying ARIA attributes (like `aria-valuenow` on a progress bar) in integration tests ensures dynamic accessibility features aren't regressed. Playwright's `expect(locator).to_have_attribute()` is perfect for this.
+**Action:** Add accessibility verification steps to E2E tests for dynamic UI elements like progress bars and status indicators.
