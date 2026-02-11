@@ -551,11 +551,11 @@
         </div>
     </noscript>
     <!-- Boot Screen -->
-    <div id="boot-screen">
+    <div id="boot-screen" role="alert" aria-live="assertive">
         <div class="boot-logo">LEGION OS</div>
         <div class="boot-message">INITIALIZING STRATEGY CORE...</div>
         <div class="boot-message">LOADING TACTICAL MODULES...</div>
-        <div class="boot-progress">
+        <div class="boot-progress" role="progressbar" aria-label="System Boot Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <div class="boot-progress-bar" id="boot-bar"></div>
         </div>
     </div>
@@ -576,11 +576,11 @@
         </div>
 
         <div id="nodes-info">
-            <button class="node-hint" data-node="target-analysis">TARGET ANALYSIS</button>
-            <button class="node-hint" data-node="intel-viz">INTEL VISUALIZATION</button>
-            <button class="node-hint" data-node="field-ops">FIELD OPERATIONS</button>
-            <button class="node-hint" data-node="training">TRAINING PROTOCOLS</button>
-            <button class="node-hint" data-node="archive">DATA ARCHIVE</button>
+            <button class="node-hint" data-node="target-analysis" aria-label="Open Target Analysis Module">TARGET ANALYSIS</button>
+            <button class="node-hint" data-node="intel-viz" aria-label="Open Intel Visualization Module">INTEL VISUALIZATION</button>
+            <button class="node-hint" data-node="field-ops" aria-label="Open Field Operations Module">FIELD OPERATIONS</button>
+            <button class="node-hint" data-node="training" aria-label="Open Training Protocols Module">TRAINING PROTOCOLS</button>
+            <button class="node-hint" data-node="archive" aria-label="Open Data Archive Module">DATA ARCHIVE</button>
         </div>
 
         <!-- Terminal Modal -->
