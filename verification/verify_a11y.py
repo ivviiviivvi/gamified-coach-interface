@@ -15,6 +15,9 @@ def verify_terminal_accessibility():
         print("Waiting for boot screen to clear...")
         page.wait_for_selector("#boot-screen.hidden", timeout=10000)
 
+        # Give a moment for JS to attach listeners after boot
+        time.sleep(1)
+
         # Click on "TARGET ANALYSIS" node to open the terminal
         # It has role="button" and aria-label="Open Target Analysis Module"
         print("Opening Target Analysis module...")

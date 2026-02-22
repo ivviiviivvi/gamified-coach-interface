@@ -19,7 +19,11 @@ class LegionCommandCenter {
         await this.bootSequence();
 
         // Initialize 3D scene
-        this.initializeScene();
+        try {
+            this.initializeScene();
+        } catch (error) {
+            console.warn('3D Scene initialization failed, falling back to 2D interface:', error);
+        }
 
         // Setup UI event listeners
         this.setupUIListeners();
@@ -31,6 +35,7 @@ class LegionCommandCenter {
     async bootSequence() {
         const bootScreen = document.getElementById('boot-screen');
         const bootBar = document.getElementById('boot-bar');
+        const bootProgress = document.querySelector('.boot-progress');
 
         return new Promise((resolve) => {
             let progress = 0;
@@ -39,6 +44,7 @@ class LegionCommandCenter {
                 if (progress > 100) progress = 100;
 
                 bootBar.style.width = progress + '%';
+                if (bootProgress) bootProgress.setAttribute('aria-valuenow', Math.round(progress));
 
                 if (progress === 100) {
                     clearInterval(interval);
@@ -129,10 +135,12 @@ class LegionCommandCenter {
         modal.classList.remove('active');
 
         // Deactivate node
-        this.sceneManager.getOrbitalNodes().deactivateNode();
+        if (this.sceneManager) {
+            this.sceneManager.getOrbitalNodes().deactivateNode();
 
-        // Reset core state
-        this.sceneManager.setCoreStat('idle');
+            // Reset core state
+            this.sceneManager.setCoreStat('idle');
+        }
 
         // Clear active hint
         const nodeHints = document.querySelectorAll('.node-hint');
@@ -361,7 +369,9 @@ Please complete all fields and retry.
         analyzeBtn.textContent = 'ANALYZING...';
 
         // Activate core animation
-        this.sceneManager.setCoreStat('analyzing');
+        if (this.sceneManager) {
+            this.sceneManager.setCoreStat('analyzing');
+        }
 
         resultsContainer.innerHTML = `
             <div class="loading-indicator active">
@@ -386,7 +396,9 @@ Please complete all fields and retry.
             const analysis = await this.callGeminiAPI(targetAvatar, transformationGoals, uniqueMethod);
 
             // Success state
-            this.sceneManager.setCoreStat('success');
+            if (this.sceneManager) {
+                this.sceneManager.setCoreStat('success');
+            }
 
             // Display results
             resultsContainer.innerHTML = `
@@ -402,7 +414,9 @@ Please complete all fields and retry.
             console.error('Analysis error:', error);
 
             // Error state
-            this.sceneManager.setCoreStat('idle');
+            if (this.sceneManager) {
+                this.sceneManager.setCoreStat('idle');
+            }
 
             resultsContainer.innerHTML = `
                 <div class="data-packet" style="border-color: var(--danger-red);">
