@@ -36,7 +36,9 @@ class LegionCommandCenter {
             let progress = 0;
             const interval = setInterval(() => {
                 progress += Math.random() * 15;
-                if (progress > 100) progress = 100;
+                if (progress > 100) {
+                    progress = 100;
+                }
 
                 bootBar.style.width = progress + '%';
 
@@ -453,7 +455,7 @@ Format your response in a clear, tactical style suitable for a military command 
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + this.geminiApiKey, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 contents: [{
