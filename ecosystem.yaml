@@ -1,0 +1,11 @@
+schema_version: '1.0'
+repo: gamified-coach-interface
+organ: III
+display_name: Gamified coaching system with progress tracking
+delivery:
+- platform: web_app
+  status: not_started
+revenue:
+- platform: subscription
+  status: planned
+  priority: critical
