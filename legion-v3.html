@@ -556,7 +556,7 @@
         <div class="boot-message">INITIALIZING STRATEGY CORE...</div>
         <div class="boot-message">LOADING TACTICAL MODULES...</div>
         <div class="boot-progress">
-            <div class="boot-progress-bar" id="boot-bar"></div>
+            <div class="boot-progress-bar" id="boot-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
         </div>
     </div>
 
@@ -587,9 +587,9 @@
         <div id="terminal-modal" role="dialog" aria-modal="true" aria-labelledby="terminal-title">
             <div class="terminal-header">
                 <h2 class="terminal-title" id="terminal-title">TERMINAL</h2>
-                <button class="terminal-close" id="close-terminal">CLOSE</button>
+                <button class="terminal-close" id="close-terminal" aria-label="Close Terminal">CLOSE</button>
             </div>
-            <div id="terminal-content">
+            <div id="terminal-content" aria-live="polite">
                 <!-- Content will be dynamically inserted -->
             </div>
         </div>
